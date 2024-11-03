@@ -9,7 +9,7 @@ public class SelectAllElement<I, O> extends Element<List<I>, O> {
   }
 
   @Override
-  public Blurs<O> apply(Blur<List<I>> blur) {
+  public Blurs<O> apply(LensRuntime runtime, Blur<List<I>> blur) {
     return blur.divide();
   }
 

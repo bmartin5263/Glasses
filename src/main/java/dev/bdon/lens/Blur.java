@@ -1,7 +1,6 @@
 package dev.bdon.lens;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class Blur<T> {
   private Lens<?, ?> lens;
@@ -11,14 +10,20 @@ public class Blur<T> {
   private final boolean dead;
 
   private Blur(Lens<?, ?> lens, T value, Integer index, Route route, boolean dead) {
-    this.value = Assert.nonNull(value, "Blur value cannot be null");
+    this.lens = Assert.argumentNonNull(lens, "lens");
+    this.value = Assert.nonNull(value, "value cannot be null. Use dead=true and a non-null value to represent null");
     this.index = index;
-    this.route = route;
+    this.route = Assert.argumentNonNull(route, "route");;
     this.dead = dead;
   }
 
   public static <T> Blur<T> root(Lens<?, ?> lens, T value) {
     return new Blur<>(lens, value, null, Route.start(), false);
+  }
+
+  public <I, O> Blur<O> killed(Property<I, O> deadProperty) {
+    O tracer = LensUtils.newTracer(deadProperty.type());
+    return new Blur<>(lens, tracer, null, route.addComponent("." + deadProperty.name()), true);
   }
 
   public Image<T> toImage() {
@@ -37,17 +42,15 @@ public class Blur<T> {
     return dead;
   }
 
-  public <X> Blur<X> next(Function<T, X> mapper, String pathComponent, X deadValue) {
-    X nextValue = deadValue;
-    boolean isDead = true;
-    if (!isDead()) {
-      var mappedValue = mapper.apply(value);
-      if (mappedValue != null) {
-        nextValue = mappedValue;
-        isDead = false;
-      }
+  public <X> Blur<X> next(Property<T, X> property) {
+    if (isDead()) {
+      return killed(property);
     }
-    return new Blur<>(lens, nextValue, null, route.addComponent(pathComponent), isDead);
+    var nextValue = property.get(value);
+    if (nextValue == null) {
+      return killed(property);
+    }
+    return new Blur<>(lens, nextValue, null, route.addComponent("." + property.name()), false);
   }
 
   @SuppressWarnings("unchecked")

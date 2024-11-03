@@ -6,13 +6,14 @@ public class LensImpl {
 
   public static List<Image<Object>> focus(Lens<Object, Object> lens, Object target) {
     Assert.nonNull(target, "target", LensExecutionException::new);
+    var runtime = new LensRuntime(lens);
     var blurs = Blurs.single(Blur.root(lens, target));
 
     var elements = LensUtils.gatherElements(lens.leaf());
     for (var element : elements) {
       var nextBlurs = new Blurs<>();
       for (var blur : blurs) {
-        nextBlurs.addAll(element.apply(blur));
+        nextBlurs.addAll(element.apply(runtime, blur));
       }
       blurs = nextBlurs;
     }
@@ -24,7 +25,7 @@ public class LensImpl {
 
   public static <I, O> O overwrite(Lens<Object, Object> lens, I target, O newValue) {
     Assert.nonNull(target, "target", LensExecutionException::new);
-    Assert.nonNull(lens, "lens");
+    Assert.argumentNonNull(lens, "lens");
     Assert.nonNull(lens.leaf(), LensExecutionException::new, "overwrite() cannot be called on Images produced from empty Lenses");
 
     Object current = target;

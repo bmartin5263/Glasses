@@ -38,8 +38,8 @@ class LensTest {
   @ValueSource(strings = "Chicago")
   void focus_twoSelects(String value) {
     var lens = Lens.create(Library.class)
-        .select(Library::getAddress, Library::setAddress, Address.class)
-        .select(Address::getCity, Address::setCity, String.class);
+        .select(Library::setAddress, Address.class)
+        .select(Address::setCity, String.class);
     var target = new Library().setAddress(new Address().setCity(value));
 
     assertThat(lens.path()).isEqualTo("$.address.city");
@@ -61,9 +61,9 @@ class LensTest {
   @Test
   void focus_oneSelect_oneSelectAll_oneSelect() {
     var lens = Lens.create(Library.class)
-        .select(Library::getAddress, Library::setAddress, Address.class)
-        .selectAll(Address::getLines, Line.class)
-        .select(Line::getText, Line::setText, String.class);
+        .select(Library::setAddress, Address.class)
+        .selectAll(Address::setLines, Line.class)
+        .select(Line::setText, String.class);
     var target = new Library()
         .setAddress(new Address()
             .setLines(new ArrayList<>(List.of(
