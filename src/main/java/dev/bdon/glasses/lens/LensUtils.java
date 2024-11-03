@@ -1,4 +1,6 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.lens;
+
+import dev.bdon.glasses.lens.element.Element;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -12,7 +14,7 @@ public class LensUtils {
   private LensUtils() {}
 
   @SuppressWarnings("unchecked")
-  static <T> T newTracer(Class<T> type) {
+  public static <T> T newTracer(Class<T> type) {
     return (T) TRACER_FACTORY_BY_TYPE.computeIfAbsent(type, k -> instantiateTracerFactory((Class<Object>) k)).get();
   }
 

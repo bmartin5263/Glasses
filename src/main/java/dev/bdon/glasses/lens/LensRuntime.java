@@ -1,4 +1,4 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.lens;
 
 public class LensRuntime {
   private final Lens<?, ?> lens;

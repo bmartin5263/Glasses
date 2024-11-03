@@ -1,4 +1,4 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.lens;
 
 import java.util.*;
 

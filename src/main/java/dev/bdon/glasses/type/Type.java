@@ -1,9 +1,12 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.type;
 
-import java.util.IdentityHashMap;
+import dev.bdon.glasses.util.ReflectionUtils;
+import dev.bdon.glasses.lens.LensInternalException;
+import dev.bdon.glasses.lens.LensUtils;
+import dev.bdon.glasses.util.Setter;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,6 +48,10 @@ public class Type<T> {
     }
 
     throw new LensInternalException("Unable to find property of type %s on target type %s", propertyType, target.getClass());
+  }
+
+  public T instantiate() {
+    return LensUtils.newTracer(clazz);
   }
 
   @SuppressWarnings("unchecked")

@@ -1,4 +1,8 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.lens;
+
+import dev.bdon.glasses.lens.element.SelectElement;
+import dev.bdon.glasses.util.Assert;
+import dev.bdon.glasses.util.Setter;
 
 import java.util.List;
 
@@ -21,6 +25,18 @@ public class LensImpl {
     return blurs.stream()
         .map(Blur::toImage)
         .toList();
+  }
+
+  public static <I, O, X, L extends Lens<I, X>> L select(
+      InternalLens<O> lens,
+      Setter<O, X> setter,
+      Class<X> type,
+      LensConstructor<I, X, L> constructor
+  ) {
+    var target = LensUtils.newTracer(lens.outputType());
+    var property = lens.context().findProperty(target, setter, type);
+    var next = new SelectElement<>(lens.leaf(), property);
+    return constructor.construct(lens.context(), type, next);
   }
 
 }

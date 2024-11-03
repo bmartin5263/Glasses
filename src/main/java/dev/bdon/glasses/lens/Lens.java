@@ -1,11 +1,15 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.lens;
+
+import dev.bdon.glasses.lens.element.Element;
+import dev.bdon.glasses.util.Getter;
+import dev.bdon.glasses.util.Setter;
 
 import java.util.List;
 
 public sealed interface Lens<I, O> permits MonoLens, PolyLens {
   // Building Methods
   <X> Lens<I, X> select(Setter<O, X> setter, Class<X> type);
-  <X, L extends List<X>> Lens<I, X> selectFirst(Getter<O, L> getter);
+  <X> Lens<I, X> selectFirst(Setter<O, List<X>> setter, Class<X> type);
   <X> PolyLens<I, X> selectAll(Setter<O, List<X>> getter, Class<X> type);
 
   // Execution Methods
@@ -19,6 +23,7 @@ public sealed interface Lens<I, O> permits MonoLens, PolyLens {
   // Accessors
   LensContext context();
   <X> Element<X, O> leaf();
+  Class<O> outputType();
 
   default String path() {
     var leaf = leaf();

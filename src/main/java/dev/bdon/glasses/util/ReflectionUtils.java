@@ -1,13 +1,15 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.util;
 
-import java.lang.reflect.Field;
+import dev.bdon.glasses.type.JavaField;
+import dev.bdon.glasses.lens.LensInternalException;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
-import java.util.stream.Stream;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class ReflectionUtils {
-  private static final Map<Class<?>, List<JavaField>> FIELD_CACHE = new HashMap<>();
   private static final Set<Class<?>> PRIMITIVES = Set.of(
       Boolean.class,
       Byte.class,
@@ -22,18 +24,27 @@ public class ReflectionUtils {
       BigDecimal.class,
       BigInteger.class
   );
+  private static final Map<Class<?>, List<JavaField>> FIELD_CACHE = new HashMap<>(PRIMITIVES
+      .stream()
+      .collect(Collectors.toMap(Function.identity(), k -> List.of()))
+  );
 
   public static List<JavaField> getFields(Class<?> clazz) {
     return FIELD_CACHE.computeIfAbsent(clazz, currentClass -> {
       var result = new ArrayList<JavaField>();
-      while (currentClass != null && !isPrimitive(currentClass)) {
-        for (var field : currentClass.getDeclaredFields()) {
-          result.add(new JavaField(field));
-        }
-        currentClass = currentClass.getSuperclass();
-      }
+      getFields(clazz, result);
       return List.copyOf(result);
     });
+  }
+
+  private static void getFields(Class<?> clazz, List<JavaField> fields) {
+    if (clazz == null || isPrimitive(clazz)) {
+      return;
+    }
+    getFields(clazz.getSuperclass(), fields);
+    for (var field : clazz.getDeclaredFields()) {
+      fields.add(new JavaField(field));
+    }
   }
 
   public static JavaField findFieldWithValueOn(Object target, Object value) {

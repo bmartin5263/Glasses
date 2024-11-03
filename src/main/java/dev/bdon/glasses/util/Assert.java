@@ -1,4 +1,6 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.util;
+
+import dev.bdon.glasses.lens.LensInternalException;
 
 import java.util.Objects;
 import java.util.function.Function;
@@ -11,7 +13,7 @@ public class Assert {
     return Objects.requireNonNull(obj);
   }
 
-  public static <T> T argumentNonNull(T obj, String name) {
+  public static <T> T nonNullArgument(T obj, String name) {
     return Objects.requireNonNull(obj, "%s must not be null".formatted(name));
   }
 
@@ -33,4 +35,10 @@ public class Assert {
     return obj;
   }
 
+  public static int positiveOrZeroArgument(int value, String name) {
+    if (value < 0) {
+      throw new LensInternalException("%s must be greater than or equal to zero: %s", name, value);
+    }
+    return value;
+  }
 }

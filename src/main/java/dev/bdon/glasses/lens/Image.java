@@ -1,6 +1,4 @@
-package dev.bdon.lens;
-
-import java.util.function.Consumer;
+package dev.bdon.glasses.lens;
 
 public class Image<T> {
   private final T value;

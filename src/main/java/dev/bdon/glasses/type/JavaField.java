@@ -1,11 +1,14 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.type;
+
+import dev.bdon.glasses.util.Assert;
+import dev.bdon.glasses.lens.LensInternalException;
 
 import java.lang.reflect.Field;
 
 public record JavaField(Field actual) {
 
   public JavaField(Field actual) {
-    this.actual = Assert.argumentNonNull(actual, "actual");
+    this.actual = Assert.nonNullArgument(actual, "actual");
     actual.setAccessible(true);
   }
 

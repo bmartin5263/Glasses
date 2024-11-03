@@ -1,4 +1,4 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.util;
 
 import java.util.function.Function;
 

@@ -1,4 +1,8 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.lens.element;
+
+import dev.bdon.glasses.lens.Blur;
+import dev.bdon.glasses.lens.Blurs;
+import dev.bdon.glasses.lens.LensRuntime;
 
 import java.util.List;
 

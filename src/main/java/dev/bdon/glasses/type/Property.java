@@ -1,10 +1,13 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.type;
 
-import java.lang.reflect.Field;
+import dev.bdon.glasses.util.Getter;
+import dev.bdon.glasses.util.ReflectionUtils;
+import dev.bdon.glasses.util.Setter;
+import dev.bdon.glasses.lens.LensInternalException;
+
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
-import java.util.stream.Stream;
 
 public class Property<I, O> {
   private final String name;

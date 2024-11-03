@@ -1,4 +1,8 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.lens.element;
+
+import dev.bdon.glasses.lens.Blur;
+import dev.bdon.glasses.lens.Blurs;
+import dev.bdon.glasses.lens.LensRuntime;
 
 public abstract class Element<I, O> {
   private final Element<Object, Object> parent;

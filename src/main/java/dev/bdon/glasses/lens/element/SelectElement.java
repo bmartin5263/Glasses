@@ -1,4 +1,10 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.lens.element;
+
+import dev.bdon.glasses.util.Assert;
+import dev.bdon.glasses.lens.Blur;
+import dev.bdon.glasses.lens.Blurs;
+import dev.bdon.glasses.lens.LensRuntime;
+import dev.bdon.glasses.type.Property;
 
 public class SelectElement<I, O> extends Element<I, O> {
   private final Property<I, O> property;
@@ -8,7 +14,7 @@ public class SelectElement<I, O> extends Element<I, O> {
       Property<I, O> property
   ) {
     super(parent);
-    this.property = Assert.argumentNonNull(property, "property");
+    this.property = Assert.nonNullArgument(property, "property");
   }
 
   @Override

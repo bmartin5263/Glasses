@@ -1,12 +1,14 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.lens;
+
+import dev.bdon.glasses.lens.element.Element;
+import dev.bdon.glasses.util.Setter;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 public non-sealed class PolyLens<I, O> implements Lens<I, O> {
   private final LensContext context;
   private final Class<O> outputType;
-  private final Element<Object, Object> leaf;
+  private final Element<Object, O> leaf;
 
   public PolyLens(LensContext context, Class<O> outputType, Element<?, O> leaf) {
     this.context = context;
@@ -34,20 +36,26 @@ public non-sealed class PolyLens<I, O> implements Lens<I, O> {
   }
 
   @Override
-  public <X> PolyLens<I, X> select(Setter<O, X> setter, Class<X> type) {
-    var tracer = LensUtils.newTracer(outputType);
-    var property = context.findProperty(tracer, setter, type);
-    var next = new SelectElement<>(leaf, property);
-    return new PolyLens<>(context, type, next);
+  public Class<O> outputType() {
+    return outputType;
   }
 
   @Override
-  public <X, L extends List<X>> PolyLens<I, X> selectFirst(Getter<O, L> getter) {
-    return null;
+  public <X> PolyLens<I, X> select(Setter<O, X> setter, Class<X> type) {
+    return LensImpl.select(new InternalLens<>(context, leaf, outputType), setter, type, constructor());
+  }
+
+  private static <I, O> LensConstructor<I, O, PolyLens<I, O>> constructor() {
+    return PolyLens::new;
+  }
+
+  @Override
+  public <X> PolyLens<I, X> selectFirst(Setter<O, List<X>> setter, Class<X> type) {
+    throw new UnsupportedOperationException();
   }
 
   @Override
   public <X> PolyLens<I, X> selectAll(Setter<O, List<X>> getter, Class<X> type) {
-    return null;
+    throw new UnsupportedOperationException();
   }
 }

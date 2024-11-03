@@ -1,17 +1,17 @@
 package dev.bdon.lens;
 
+import dev.bdon.glasses.lens.Lens;
+import dev.bdon.glasses.lens.LensExecutionException;
 import dev.bdon.lens.model.Address;
 import dev.bdon.lens.model.Library;
 import dev.bdon.lens.model.Line;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -92,16 +92,34 @@ class LensTest {
     );
   }
 
-//  private static class LensTestParams {
-//    private
-//  }
-//
-//  private static Stream<Arguments> provideStringsForIsBlank() {
-//    return Stream.of(
-//        Arguments.of(null, true),
-//        Arguments.of("", true),
-//        Arguments.of("  ", true),
-//        Arguments.of("not blank", false)
-//    );
-//  }
+  @Test
+  void focus_oneSelect_oneSelectFirst_oneSelect() {
+    var lens = Lens.create(Library.class)
+        .select(Library::setAddress, Address.class)
+        .selectFirst(Address::setLines, Line.class)
+        .select(Line::setText, String.class);
+    var target = new Library()
+        .setAddress(new Address()
+            .setLines(new ArrayList<>(List.of(
+                new Line().setText("line1"),
+                new Line().setText("line2"),
+                new Line().setText(null)
+            )))
+        );
+
+    assertThat(lens.path()).isEqualTo("$.address.lines[0].text");
+
+    var result1 = lens.focus(target);
+    assertAll(
+        () -> assertThat(result1.value()).isEqualTo("line1"),
+        () -> assertThat(result1.path()).isEqualTo("$.address.lines[0].text")
+    );
+
+    target.setAddress(null);
+    var result2 = lens.focus(target);
+    assertAll(
+        () -> assertThat(result2.value()).isEqualTo(null),
+        () -> assertThat(result2.path()).isEqualTo("$.address.lines[0].text")
+    );
+  }
 }
