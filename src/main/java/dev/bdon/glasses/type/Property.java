@@ -1,15 +1,16 @@
 package dev.bdon.glasses.type;
 
+import dev.bdon.glasses.lens.LensInternalException;
 import dev.bdon.glasses.util.Getter;
 import dev.bdon.glasses.util.ReflectionUtils;
 import dev.bdon.glasses.util.Setter;
-import dev.bdon.glasses.lens.LensInternalException;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.stream.Stream;
 
-public class Property<I, O> {
+public class Property<I, O> implements IProperty<I, O> {
   private final String name;
   private final Getter<I, O> getter;
   private final Setter<I, O> setter;
@@ -32,23 +33,26 @@ public class Property<I, O> {
     return name;
   }
 
-  public List<Type> genericArguments() {
+  private List<Type> genericArguments() {
     return genericArguments;
   }
 
+  @Override
   public O get(I target) {
     return getter.get(target);
   }
 
+  @Override
   public void set(I target, O newValue) {
     setter.set(target, newValue);
   }
 
+  @Override
   public Class<O> type() {
     return type;
   }
 
-  public boolean isCollection() {
+  private boolean isCollection() {
     return ReflectionUtils.isCollection(type);
   }
 
@@ -68,5 +72,19 @@ public class Property<I, O> {
     else {
       throw new LensInternalException("Unhandled generic supertype %s", genericType);
     }
+  }
+
+  @Override
+  public Stream<Class<?>> getClasses() {
+    var result = Stream.<Class<?>>builder();
+    if (isCollection()) {
+      for (var genericType : genericArguments()) {
+        result.add((Class<?>) genericType);
+      }
+    }
+    else {
+      result.add(type());
+    }
+    return result.build();
   }
 }

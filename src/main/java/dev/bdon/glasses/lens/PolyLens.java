@@ -31,6 +31,11 @@ public non-sealed class PolyLens<I, O> implements Lens<I, O> {
   }
 
   @Override
+  public void override(Image<O> image, O newValue) {
+    LensImpl.override(toInternalLens(), image, newValue);
+  }
+
+  @Override
   public <X> Element<X, O> leaf() {
     return Element.unchecked(leaf);
   }
@@ -42,20 +47,24 @@ public non-sealed class PolyLens<I, O> implements Lens<I, O> {
 
   @Override
   public <X> PolyLens<I, X> select(Setter<O, X> setter, Class<X> type) {
-    return LensImpl.select(new InternalLens<>(context, leaf, outputType), setter, type, constructor());
-  }
-
-  private static <I, O> LensConstructor<I, O, PolyLens<I, O>> constructor() {
-    return PolyLens::new;
+    return LensImpl.select(toInternalLens(), setter, type, constructor());
   }
 
   @Override
   public <X> PolyLens<I, X> selectFirst(Setter<O, List<X>> setter, Class<X> type) {
-    throw new UnsupportedOperationException();
+    return LensImpl.selectFirst(toInternalLens(), setter, type, constructor());
   }
 
   @Override
-  public <X> PolyLens<I, X> selectAll(Setter<O, List<X>> getter, Class<X> type) {
-    throw new UnsupportedOperationException();
+  public <X> PolyLens<I, X> selectAll(Setter<O, List<X>> setter, Class<X> type) {
+    return LensImpl.selectAll(toInternalLens(), setter, type);
+  }
+
+  private InternalLens<O> toInternalLens() {
+    return new InternalLens<>(context, leaf, outputType);
+  }
+
+  private static <I, O> LensConstructor<I, O, PolyLens<I, O>> constructor() {
+    return PolyLens::new;
   }
 }

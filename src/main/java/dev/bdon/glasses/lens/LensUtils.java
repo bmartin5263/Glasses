@@ -4,9 +4,13 @@ import dev.bdon.glasses.lens.element.Element;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 public class LensUtils {
   private static final Map<Class<?>, Supplier<?>> TRACER_FACTORY_BY_TYPE = new ConcurrentHashMap<>();
@@ -19,15 +23,16 @@ public class LensUtils {
   }
 
   // Reverses the element linked list
-  static Iterable<Element<Object, Object>> gatherElements(Element<Object, Object> last) {
-    var elements = new ArrayList<Element<Object, Object>>();
-    for (Element<Object, Object> current = last; current != null; current = current.parent()) {
+  static <A, B> Stream<Element<A, B>> reverseElementChain(Element<A, B> last) {
+    var elements = new ArrayList<Element<A, B>>();
+    for (var current = last; current != null; current = current.parent()) {
       elements.add(current);
     }
     Collections.reverse(elements);
-    return elements;
+    return elements.stream();
   }
 
+  @SuppressWarnings("unchecked")
   private static <T> Supplier<T> instantiateTracerFactory(Class<T> type) {
     if (List.class.isAssignableFrom(type)) {
       return () -> (T) new ArrayList<>();

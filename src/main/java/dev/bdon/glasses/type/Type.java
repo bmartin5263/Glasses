@@ -1,8 +1,8 @@
 package dev.bdon.glasses.type;
 
-import dev.bdon.glasses.util.ReflectionUtils;
 import dev.bdon.glasses.lens.LensInternalException;
 import dev.bdon.glasses.lens.LensUtils;
+import dev.bdon.glasses.util.ReflectionUtils;
 import dev.bdon.glasses.util.Setter;
 
 import java.util.List;
@@ -57,6 +57,10 @@ public class Type<T> {
   @SuppressWarnings("unchecked")
   public static <A, B> Type<A> unchecked(Type<B> property) {
     return (Type<A>) property;
+  }
+
+  public Class<T> javaClass() {
+    return clazz;
   }
 
   private record PossibleProperty<I, O>(Property<I, O> actual, O originalValue) {

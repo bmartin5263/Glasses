@@ -1,7 +1,6 @@
 package dev.bdon.glasses.lens;
 
 import dev.bdon.glasses.lens.element.Element;
-import dev.bdon.glasses.util.Getter;
 import dev.bdon.glasses.util.Setter;
 
 import java.util.List;
@@ -14,6 +13,7 @@ public sealed interface Lens<I, O> permits MonoLens, PolyLens {
 
   // Execution Methods
   List<Image<O>> focusToList(I target);
+  void override(Image<O> image, O newValue);
 
   // Factory Methods
   static <T> MonoLens<T, T> create(Class<T> type) {
@@ -22,12 +22,12 @@ public sealed interface Lens<I, O> permits MonoLens, PolyLens {
 
   // Accessors
   LensContext context();
-  <X> Element<X, O> leaf();
+  <X> Element<X, O> leaf(); // TODO - hide from interface
   Class<O> outputType();
 
   default String path() {
     var leaf = leaf();
-    var elements = LensUtils.gatherElements((Element<Object, Object>) leaf);
+    var elements = LensUtils.reverseElementChain((Element<Object, Object>) leaf);
     var iter = elements.iterator();
     if (!iter.hasNext()) {
       return "$";

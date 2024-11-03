@@ -17,11 +17,19 @@ public class Assert {
     return Objects.requireNonNull(obj, "%s must not be null".formatted(name));
   }
 
-  public static <T> T nonNull(T obj, String message) {
-    return Objects.requireNonNull(obj, message);
+  public static <T> T nonNull(T obj, String format, Object... args) {
+    return Objects.requireNonNull(obj, format.formatted(args));
   }
 
-  public static <T, E extends RuntimeException> T nonNull(T obj, String name, Function<String, E> exceptionFactory) {
+
+  public static int between(int subject, int minInclusive, int maxExclusive, String format, Object... args) {
+    if (subject >= minInclusive && subject < maxExclusive) {
+      return subject;
+    }
+    throw new LensInternalException(format, args);
+  }
+
+  public static <T, E extends RuntimeException> T nonNullArgument(T obj, String name, Function<String, E> exceptionFactory) {
     if (obj == null) {
       throw exceptionFactory.apply("%s must not be null".formatted(name));
     }

@@ -1,7 +1,7 @@
 package dev.bdon.glasses.type;
 
-import dev.bdon.glasses.util.ReflectionUtils;
 import dev.bdon.glasses.lens.LensInternalException;
+import dev.bdon.glasses.util.ReflectionUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -24,16 +24,9 @@ public class TypeRegistry {
   }
 
   private void registerChildren(Type<?> type) {
-    type.properties().forEach(property -> {
-      if (property.isCollection()) {
-        for (var genericType : property.genericArguments()) {
-          register((Class<?>) genericType);
-        }
-      }
-      else {
-        register(property.type());
-      }
-    });
+    type.properties()
+        .flatMap(Property::getClasses)
+        .forEach(this::register);
   }
 
   public <T> Type<T> getType(T object) {

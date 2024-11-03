@@ -12,5 +12,6 @@ import java.util.List;
 public class Book extends Media {
   private String title;
   private String author;
+  private BookContent content;
   private List<Page> pages;
 }

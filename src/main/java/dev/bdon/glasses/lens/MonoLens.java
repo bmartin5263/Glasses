@@ -1,8 +1,6 @@
 package dev.bdon.glasses.lens;
 
-import dev.bdon.glasses.lens.element.*;
-import dev.bdon.glasses.type.Property;
-import dev.bdon.glasses.util.Getter;
+import dev.bdon.glasses.lens.element.Element;
 import dev.bdon.glasses.util.Setter;
 
 import java.util.List;
@@ -19,7 +17,7 @@ public non-sealed class MonoLens<I, O> implements Lens<I, O> {
   public MonoLens(LensContext context, Class<O> outputType, Element<?, O> leaf) {
     this.context = context;
     this.outputType = outputType;
-    this.leaf = (Element<Object, O>) leaf;
+    this.leaf = Element.unchecked(leaf);
   }
 
   public Image<O> focus(I target) {
@@ -29,6 +27,11 @@ public non-sealed class MonoLens<I, O> implements Lens<I, O> {
   @Override
   public List<Image<O>> focusToList(I target) {
     return (List<Image<O>>) (List<?>) LensImpl.focus((Lens<Object, Object>) this, target);
+  }
+
+  @Override
+  public void override(Image<O> image, O newValue) {
+    LensImpl.override(toInternalLens(), image, newValue);
   }
 
   @Override
@@ -48,26 +51,21 @@ public non-sealed class MonoLens<I, O> implements Lens<I, O> {
 
   @Override
   public <X> MonoLens<I, X> select(Setter<O, X> setter, Class<X> type) {
-    return LensImpl.select(new InternalLens<>(context, leaf, outputType), setter, type, constructor());
+    return LensImpl.select(toInternalLens(), setter, type, constructor());
   }
 
   @Override
   public <X> MonoLens<I, X> selectFirst(Setter<O, List<X>> setter, Class<X> type) {
-    var target = LensUtils.newTracer(outputType);
-    var listClass = (Class<List<X>>)(Class<?>)List.class;
-    var listComponentType = context.findType(type);
-    var listProperty = context.findProperty(target, setter, listClass);
-    var next = new SelectAtElement<List<X>, X>(new SelectListElement<>(leaf, listProperty), listComponentType, 0);
-    return new MonoLens<>(context, type, next);
+    return LensImpl.selectFirst(toInternalLens(), setter, type, constructor());
   }
 
   @Override
   public <X> PolyLens<I, X> selectAll(Setter<O, List<X>> setter, Class<X> type) {
-    O target = LensUtils.newTracer(outputType);
-    Class<List<X>> listClass = (Class<List<X>>)(Class<?>)List.class;
-    Property<O, List<X>> listProperty = context.findProperty(target, setter, listClass);
-    SelectAllElement<List<X>, X> next = new SelectAllElement<>(new SelectListElement<>(leaf, listProperty));
-    return new PolyLens<>(context, type, next);
+    return LensImpl.selectAll(toInternalLens(), setter, type);
+  }
+
+  private InternalLens<O> toInternalLens() {
+    return new InternalLens<>(context, leaf, outputType);
   }
 
   private static <I, O> LensConstructor<I, O, MonoLens<I, O>> constructor() {

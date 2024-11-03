@@ -7,26 +7,24 @@ import dev.bdon.glasses.util.Assert;
 import java.util.List;
 
 public class Blur<T> {
-  private Lens<?, ?> lens;
+  private final Lens<?, ?> lens;
   private final T value;
-  private final Integer index;
   private final Route route;
   private final boolean dead;
 
-  private Blur(Lens<?, ?> lens, T value, Integer index, Route route, boolean dead) {
+  private Blur(Lens<?, ?> lens, T value, Route route, boolean dead) {
     this.lens = Assert.nonNullArgument(lens, "lens");
     this.value = Assert.nonNull(value, "value cannot be null. Use dead=true and a non-null value to represent null");
-    this.index = index;
     this.route = Assert.nonNullArgument(route, "route");;
     this.dead = dead;
   }
 
   public static <T> Blur<T> root(Lens<?, ?> lens, T value) {
-    return new Blur<>(lens, value, null, Route.start(), false);
+    return new Blur<>(lens, value, Route.start(), false);
   }
 
-  public Image<T> toImage() {
-    return new Image<>(dead ? null : value, route);
+  public Image<T> toImage(Object root) {
+    return new Image<>(root, dead ? null : value, route, lens);
   }
 
   public T value() {
@@ -49,7 +47,7 @@ public class Blur<T> {
     if (nextValue == null) {
       return killed(property);
     }
-    return new Blur<>(lens, nextValue, null, route.addComponent("." + property.name()), false);
+    return new Blur<>(lens, nextValue, route.addFieldComponent(property.name()), false);
   }
 
   public <X> Blur<X> nextAtIndex(Type<X> listComponentType, int index) {
@@ -61,8 +59,8 @@ public class Blur<T> {
         return killed(listComponentType, index);
       }
       var nextValue = (X) list.get(index);
-      Assert.nonNull(nextValue, LensConventionBrokenException::new, "Lists cannot have null items");
-      return new Blur<>(lens, nextValue, index, route.addComponent("[%s]".formatted(index)), false);
+      Assert.nonNull(nextValue, LensConventionViolatedException::new, "Lists cannot have null items");
+      return new Blur<>(lens, nextValue, route.addIndexComponent(index), false);
     }
     throw new LensInternalException("divide() called on a Blur not holding a List. this = %s", this);
   }
@@ -71,8 +69,8 @@ public class Blur<T> {
   public <X> Blurs<X> divide() {
     if (value instanceof List<?> list) {
       var blurs = new Blurs<X>();
-      for (int i = 0; i < list.size(); ++i) {
-        blurs.add(new Blur<>(lens, (X) list.get(i), i, route.addComponent("[%s]".formatted(i)), false));
+      for (int index = 0; index < list.size(); ++index) {
+        blurs.add(new Blur<>(lens, (X) list.get(index), route.addIndexComponent(index), false));
       }
       return blurs;
     }
@@ -81,12 +79,12 @@ public class Blur<T> {
 
   private <I, O> Blur<O> killed(Property<I, O> deadProperty) {
     O tracer = LensUtils.newTracer(deadProperty.type());
-    return new Blur<>(lens, tracer, null, route.addComponent("." + deadProperty.name()), true);
+    return new Blur<>(lens, tracer, route.addFieldComponent(deadProperty.name()), true);
   }
 
-  private <I, O> Blur<O> killed(Type<O> listComponentType, int index) {
+  private <O> Blur<O> killed(Type<O> listComponentType, int index) {
     O tracer = listComponentType.instantiate();
-    return new Blur<>(lens, tracer, index, route.addComponent("[%s]".formatted(index)), true);
+    return new Blur<>(lens, tracer, route.addIndexComponent(index), true);
   }
 
 }
