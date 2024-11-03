@@ -49,6 +49,11 @@ public class Property<I, O> {
     return ReflectionUtils.isCollection(type);
   }
 
+  @SuppressWarnings("unchecked")
+  public static <A, B, C, D> Property<A, B> unchecked(Property<C, D> property) {
+    return (Property<A, B>) property;
+  }
+
   public static <I, O> Property<I, O> from(JavaField field) {
     var genericType = field.actual().getGenericType();
     if (genericType instanceof ParameterizedType parameterizedType) {

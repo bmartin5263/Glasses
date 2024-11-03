@@ -14,16 +14,6 @@ public class SelectAllElement<I, O> extends Element<List<I>, O> {
   }
 
   @Override
-  public O overwrite(List<I> input, O newValue) {
-    return null;
-  }
-
-  @Override
-  public O overwriteWithDefaultIfNull(List<I> input) {
-    return null;
-  }
-
-  @Override
   public String pathComponent() {
     return "[*]";
   }

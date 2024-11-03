@@ -1,6 +1,5 @@
 package dev.bdon.lens;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SelectListElement<I, O> extends Element<I, List<O>> {
@@ -13,17 +12,7 @@ public class SelectListElement<I, O> extends Element<I, List<O>> {
 
   @Override
   public Blurs<List<O>> apply(LensRuntime runtime, Blur<I> blur) {
-    return Blurs.single(blur.next(property));
-  }
-
-  @Override
-  public List<O> overwrite(I input, List<O> newValue) {
-    return null;
-  }
-
-  @Override
-  public List<O> overwriteWithDefaultIfNull(I input) {
-    return null;
+    return Blurs.of(blur.next(property));
   }
 
   @Override

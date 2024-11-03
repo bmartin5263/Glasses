@@ -17,10 +17,6 @@ public abstract class Element<I, O> {
 
   public abstract Blurs<O> apply(LensRuntime runtime, Blur<I> blur);
 
-  public abstract O overwrite(I input, O newValue);
-
-  public abstract O overwriteWithDefaultIfNull(I input);
-
   public abstract String pathComponent();
 
   @SuppressWarnings("unchecked")

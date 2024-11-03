@@ -17,7 +17,7 @@ public class Blurs<T> extends AbstractList<Blur<T>> {
     this.delegate = new ArrayList<>(initialCapacity);
   }
 
-  public static <T> Blurs<T> single(Blur<T> blur) {
+  public static <T> Blurs<T> of(Blur<T> blur) {
     return new Blurs<>(List.of(blur));
   }
 

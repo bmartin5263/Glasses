@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class TypeRegistry {
-  private final Map<Class<?>, Type> TYPE_BY_CLASS = new ConcurrentHashMap<>();
+  private final Map<Class<?>, Type<?>> TYPE_BY_CLASS = new ConcurrentHashMap<>();
 
   public void register(Class<?> clazz) {
     if (ReflectionUtils.isPrimitive(clazz)) {
@@ -17,25 +17,37 @@ public class TypeRegistry {
       return Type.from(k);
     });
     if (didCompute.value) {
-      for (var property : type.properties().values().stream().flatMap(List::stream).toList()) {
-        if (property.isCollection()) {
-          for (var genericType : property.genericArguments()) {
-            register((Class<?>) genericType);
-          }
-        }
-        else {
-          register(property.type());
-        }
-      }
+      registerChildren(type);
     }
   }
 
-  public Type getType(Class<?> clazz) {
+  private void registerChildren(Type<?> type) {
+    type.properties().forEach(property -> {
+      if (property.isCollection()) {
+        for (var genericType : property.genericArguments()) {
+          register((Class<?>) genericType);
+        }
+      }
+      else {
+        register(property.type());
+      }
+    });
+  }
+
+  public <T> Type<T> getType(T object) {
+    var type = TYPE_BY_CLASS.get(object.getClass());
+    if (type == null) {
+      throw new LensInternalException("'%s' does not have a Type registered".formatted(object));
+    }
+    return Type.unchecked(type);
+  }
+
+  public <T> Type<T> getType(Class<T> clazz) {
     var type = TYPE_BY_CLASS.get(clazz);
     if (type == null) {
-      throw new LensInternalException("%s does not have a Type registered".formatted(clazz));
+      throw new LensInternalException("'%s' does not have a Type registered".formatted(clazz));
     }
-    return type;
+    return Type.unchecked(type);
   }
 
   private static class BooleanHolder {

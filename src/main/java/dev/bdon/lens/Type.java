@@ -5,32 +5,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class Type {
-  private Class<?> clazz;
-  private Map<Class<?>, List<Property<Object, Object>>> properties;
+public class Type<T> {
+  private final Class<T> clazz;
+  private final Map<Class<?>, List<Property<T, Object>>> properties;
 
-  public Type(Class<?> clazz, List<Property<Object, Object>> properties) {
+  public Type(Class<T> clazz, List<Property<T, Object>> properties) {
     this.clazz = clazz;
     this.properties = properties.stream()
         .collect(Collectors.groupingBy(Property::type));
   }
 
-  public Map<Class<?>, List<Property<Object, Object>>> properties() {
-    return properties;
+  public Stream<Property<T, Object>> properties() {
+    return properties.values().stream().flatMap(List::stream);
   }
 
-  public static Type from(Class<?> clazz) {
+  public static <T> Type<T> from(Class<T> clazz) {
     var properties = ReflectionUtils.getFields(clazz).stream()
-        .map(Property::from)
+        .map(Property::<T, Object>from)
         .toList();
-    return new Type(clazz, properties);
+    return new Type<>(clazz, properties);
   }
 
-  public <O, X> Property<O, X> findProperty(O target, Setter<O, X> setter, Class<X> propertyType) {
+  public <X> Property<T, X> findProperty(T target, Setter<T, X> setter, Class<X> propertyType) {
     var tracer = LensUtils.newTracer(propertyType);
     var possible = properties.get(propertyType).stream()
-        .map(p -> new PossibleProperty<>((Property<O, X>) p, (X) p.get(target)))
+        .map(p -> new PossibleProperty<>(Property.unchecked(p), (X) p.get(target)))
         .toList();
 
     setter.set(target, tracer);
@@ -39,7 +40,7 @@ public class Type {
       var value = property.get(target);
       property.resetOriginalValue(target);
       if (value == tracer) {
-        return unchecked(property.actual());
+        return Property.unchecked(property.actual());
       }
     }
 
@@ -47,8 +48,8 @@ public class Type {
   }
 
   @SuppressWarnings("unchecked")
-  public static <A, B, C, D> Property<A, B> unchecked(Property<C, D> property) {
-    return (Property<A, B>) property;
+  public static <A, B> Type<A> unchecked(Type<B> property) {
+    return (Type<A>) property;
   }
 
   private record PossibleProperty<I, O>(Property<I, O> actual, O originalValue) {

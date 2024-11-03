@@ -10,7 +10,7 @@ public class LensContext {
   }
 
   public <O, X> Property<O, X> findProperty(O target, Setter<O, X> setter, Class<X> propertyType) {
-    var type = typeRegistry.getType(target.getClass());
+    var type = typeRegistry.getType(target);
     return type.findProperty(target, setter, propertyType);
   }
 }
