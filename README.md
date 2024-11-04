@@ -11,15 +11,15 @@ var library = new Library()
     );
 
 var city = lens.focus(library);
-System.out.printf(city.value());  // prints 'Des Plaines'
-System.out.printf(city.path());   // prints '$.address.city'
+System.out.println(city.value());  // prints 'Des Plaines'
+System.out.println(city.path());   // prints '$.address.city'
     
 library.setAddress(null);
 city = lens.focus(library);
-System.out.printf(city.value());  // prints 'null'
+System.out.println(city.value());  // prints 'null'
 
 city.override("Chicago");
-System.out.printf(library.getAddress().getCity()); // prints 'Chicago'
+System.out.println(library.getAddress().getCity()); // prints 'Chicago'
 ```
 
 # Purpose
