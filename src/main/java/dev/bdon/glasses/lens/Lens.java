@@ -27,7 +27,7 @@ public sealed interface Lens<I, O> permits MonoLens, PolyLens {
 
   default String path() {
     var leaf = leaf();
-    var elements = LensUtils.reverseElementChain((Element<Object, Object>) leaf);
+    var elements = LensUtils.reverseElementChain(leaf);
     var iter = elements.iterator();
     if (!iter.hasNext()) {
       return "$";

@@ -225,4 +225,29 @@ class LensTest {
         () -> assertThat(result2).isEmpty()
     );
   }
+
+  @Test
+  void overwrite_multiplePropertiesSameValue_shouldOverwriteCorrectOnes() {
+    var sameValue = "sameValue";
+    var lens = Lens.create(Library.class)
+        .select(Library::setAddress, Address.class)
+        .select(Address::setCity, String.class);
+    var target = new Library()
+        .setAddress(new Address()
+            .setCity(sameValue)
+            .setState(sameValue)
+            .setZipcode(sameValue)
+        );
+
+    var result = lens.focus(target);
+    
+    assertThat(result.path()).isEqualTo("$.address.city");
+    assertThat(result.value()).isEqualTo(sameValue);
+
+    result.override("a new value");
+
+    assertThat(target.getAddress().getCity()).isEqualTo("a new value");
+    assertThat(target.getAddress().getState()).isEqualTo(sameValue);
+    assertThat(target.getAddress().getZipcode()).isEqualTo(sameValue);
+  }
 }
