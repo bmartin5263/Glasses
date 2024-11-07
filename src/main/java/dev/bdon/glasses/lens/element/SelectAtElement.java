@@ -1,9 +1,9 @@
 package dev.bdon.glasses.lens.element;
 
-import dev.bdon.glasses.lens.Blur;
-import dev.bdon.glasses.lens.Blurs;
-import dev.bdon.glasses.lens.DynamicComponent;
-import dev.bdon.glasses.lens.LensRuntime;
+import dev.bdon.glasses.lens.*;
+import dev.bdon.glasses.path.DynamicNode;
+import dev.bdon.glasses.path.IndexNode;
+import dev.bdon.glasses.path.PathNode;
 import dev.bdon.glasses.type.IProperty;
 import dev.bdon.glasses.type.IndexedProperty;
 import dev.bdon.glasses.type.Type;
@@ -11,34 +11,49 @@ import dev.bdon.glasses.util.Assert;
 
 import java.util.Deque;
 import java.util.List;
-import java.util.Optional;
 
-public class SelectAtElement<O> extends Element<List<O>, O> {
-  private final Type<O> listComponentType;
-  private final int index;
+public class SelectAtElement<O> extends SelectionElement<List<O>, O> {
+  private final IndexedProperty<O> property;
+  private final PathNode pathNode;
 
   public SelectAtElement(
       Element<?, ?> parent,
-      Type<O> listComponentType,
+      Type<O> listItemType,
       int index
   ) {
     super(parent);
-    this.listComponentType = Assert.nonNullArgument(listComponentType, "listComponentType");
-    this.index = Assert.positiveOrZeroArgument(index, "index");
+    this.property = new IndexedProperty<>(listItemType.javaClass(), index);
+    this.pathNode = new IndexNode(index);
   }
 
   @Override
   public Blurs<O> apply(LensRuntime runtime, Blur<List<O>> blur) {
-    return Blurs.of(blur.nextAtIndex(listComponentType, index));
+    if (blur.isDead()) {
+      return Blurs.of(kill(blur));
+    }
+    var list = blur.value();
+    if (property.index() >= list.size()) {
+      return Blurs.of(kill(blur));
+    }
+    var nextValue = (O) list.get(property.index());
+    Assert.nonNull(nextValue, LensConventionViolatedException::new, "Lists cannot have null items");
+    return Blurs.of(
+        new Blur<>(blur.lens(), nextValue, blur.path().append(pathNode), false)
+    );
+  }
+
+  private Blur<O> kill(Blur<List<O>> blur) {
+    O tracer = LensUtils.newTracer(property.type());
+    return new Blur<>(blur.lens(), tracer, blur.path().append(pathNode), true);
   }
 
   @Override
-  public String pathComponent() {
-    return "[%s]".formatted(index);
+  public PathNode pathNode() {
+    return pathNode;
   }
 
   @Override
-  public Optional<IProperty<List<O>, O>> property(Deque<DynamicComponent> components) {
-    return Optional.of(new IndexedProperty<>(listComponentType.javaClass(), index));
+  public IProperty<List<O>, O> property(Deque<DynamicNode> components) {
+    return property;
   }
 }

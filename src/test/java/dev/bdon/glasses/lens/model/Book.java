@@ -1,4 +1,4 @@
-package dev.bdon.lens.model;
+package dev.bdon.glasses.lens.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

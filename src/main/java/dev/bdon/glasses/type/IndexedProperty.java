@@ -15,6 +15,15 @@ public class IndexedProperty<O> implements IProperty<List<O>, O> {
   }
 
   @Override
+  public Class<O> type() {
+    return type;
+  }
+
+  public int index() {
+    return index;
+  }
+
+  @Override
   public O get(List<O> target) {
     Assert.nonNull(target, "Attempting to access index %s on null list", index);
     if (index >= target.size()) {
@@ -30,11 +39,6 @@ public class IndexedProperty<O> implements IProperty<List<O>, O> {
       target.add(newValue);
     }
     target.set(index, newValue);
-  }
-
-  @Override
-  public Class<O> type() {
-    return type;
   }
 
   @SuppressWarnings("unchecked")

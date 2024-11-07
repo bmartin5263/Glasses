@@ -4,7 +4,7 @@ A lens-like library for Java
 ```java
 var lens = Lens.create(Library.class)
     .select(Library::setAddress, Address.class)
-    .select(Address::setCity, String.class)
+    .select(Address::setCity, String.class);
 var library = new Library()
     .setAddress(new Address()
         .setCity("Des Plaines")
@@ -23,9 +23,9 @@ System.out.println(library.getAddress().getCity()); // prints 'Chicago'
 ```
 
 # Purpose
-Lenses are a way of querying nested object structures in a type-safe way by relying on class's setters methods.
+Lenses are a means to query and modify deep object trees in a type-safe way by relying on class's setters methods to define the path between properties.
 
-## Can I Use Lenses
+## Can I Use Lenses?
 Maybe! As long as every class in the object model:
 - Has a setter for every field
   - `TODO` Possibly optional for list fields if they are lazy initialized

@@ -1,6 +1,5 @@
-package dev.bdon.lens.model;
+package dev.bdon.glasses.lens.model;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -10,6 +9,7 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class Address {
+  @CustomPath("myPath")
   private String city;
   private String state;
   private String zipcode;

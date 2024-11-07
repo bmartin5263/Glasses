@@ -1,9 +1,11 @@
 package dev.bdon.glasses.type;
 
-import dev.bdon.glasses.util.Assert;
 import dev.bdon.glasses.lens.LensInternalException;
+import dev.bdon.glasses.util.Assert;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.List;
 
 public record JavaField(Field actual) {
 
@@ -16,10 +18,16 @@ public record JavaField(Field actual) {
     return actual.getName();
   }
 
+  public List<Annotation> annotations() {
+    return List.of(actual.getAnnotations());
+  }
+
+  @SuppressWarnings("unchecked")
   public <O> Class<O> type() {
     return (Class<O>) actual.getType();
   }
 
+  @SuppressWarnings("unchecked")
   public <I, O> O get(I target) {
     try {
       return (O) actual.get(target);

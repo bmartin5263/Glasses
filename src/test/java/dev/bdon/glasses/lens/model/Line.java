@@ -1,9 +1,10 @@
-package dev.bdon.lens.model;
+package dev.bdon.glasses.lens.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public abstract class Media {
+public class Line {
+  String text;
 }

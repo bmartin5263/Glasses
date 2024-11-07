@@ -1,9 +1,11 @@
 package dev.bdon.glasses.lens;
 
+import dev.bdon.glasses.lens.element.ConfigurationElement;
 import dev.bdon.glasses.lens.element.Element;
 import dev.bdon.glasses.util.Setter;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public non-sealed class MonoLens<I, O> implements Lens<I, O> {
   private final LensContext context;
@@ -26,7 +28,7 @@ public non-sealed class MonoLens<I, O> implements Lens<I, O> {
 
   @Override
   public List<Image<O>> focusToList(I target) {
-    return (List<Image<O>>) (List<?>) LensImpl.focus((Lens<Object, Object>) this, target);
+    return Lens.reify(LensImpl.focus(Lens.unchecked(this), target));
   }
 
   @Override
@@ -47,6 +49,12 @@ public non-sealed class MonoLens<I, O> implements Lens<I, O> {
   @Override
   public LensContext context() {
     return context;
+  }
+
+  public MonoLens<I, O> configure(Consumer<LensConfigurerBuilder> configurer) {
+    var builder = new LensConfigurerBuilder();
+    configurer.accept(builder);
+    return new MonoLens<>(context, outputType, new ConfigurationElement<>(builder.build()));
   }
 
   @Override

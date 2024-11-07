@@ -1,12 +1,16 @@
 package dev.bdon.glasses.lens;
 
 import dev.bdon.glasses.lens.element.Element;
+import dev.bdon.glasses.lens.element.SelectionElement;
+import dev.bdon.glasses.path.Path;
 import dev.bdon.glasses.util.Setter;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public sealed interface Lens<I, O> permits MonoLens, PolyLens {
   // Building Methods
+  Lens<I, O> configure(Consumer<LensConfigurerBuilder> configurer);
   <X> Lens<I, X> select(Setter<O, X> setter, Class<X> type);
   <X> Lens<I, X> selectFirst(Setter<O, List<X>> setter, Class<X> type);
   <X> PolyLens<I, X> selectAll(Setter<O, List<X>> getter, Class<X> type);
@@ -16,6 +20,10 @@ public sealed interface Lens<I, O> permits MonoLens, PolyLens {
   void override(Image<O> image, O newValue);
 
   // Factory Methods
+  static ConfiguredLensRoot configureRoot(Consumer<LensConfigurerBuilder> configurer) {
+    return LensContext.DEFAULT.configure(configurer);
+  }
+
   static <T> MonoLens<T, T> create(Class<T> type) {
     return LensContext.DEFAULT.create(type);
   }
@@ -27,21 +35,21 @@ public sealed interface Lens<I, O> permits MonoLens, PolyLens {
 
   default String path() {
     var leaf = leaf();
-    var elements = LensUtils.reverseElementChain(leaf);
-    var iter = elements.iterator();
-    if (!iter.hasNext()) {
-      return "$";
-    }
+    var path = new Path(LensUtils.reverseElementChain(leaf)
+        .filter(Element::isSelectionElement)
+        .map(Element::asSelectionElement)
+        .map(SelectionElement::pathNode)
+        .toList());
+    return path.toString();
+  }
 
-    var sb = new StringBuilder("$");
-    while (iter.hasNext()) {
-      var element = iter.next();
-      var pathComponent = element.pathComponent();
-      if (!pathComponent.isBlank()) {
-        sb.append(pathComponent);
-      }
-    }
+  @SuppressWarnings("unchecked")
+  static <A, B, C, D> Lens<A, B> unchecked(Lens<C, D> lens) {
+    return (Lens<A, B>) lens;
+  }
 
-    return sb.toString();
+  @SuppressWarnings("unchecked")
+  static <O> List<Image<O>> reify(List<Image<Object>> images) {
+    return (List<Image<O>>) (List<?>) images;
   }
 }

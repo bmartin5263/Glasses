@@ -1,8 +1,6 @@
-package dev.bdon.lens;
+package dev.bdon.glasses.lens;
 
-import dev.bdon.glasses.lens.Lens;
-import dev.bdon.glasses.lens.LensExecutionException;
-import dev.bdon.lens.model.*;
+import dev.bdon.glasses.lens.model.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -25,7 +23,7 @@ class LensTest {
 
     assertAll(
         () -> assertThat(result.value()).isEqualTo("a string"),
-        () -> assertThat(result.path()).isEqualTo("$")
+        () -> assertThat(result.path()).hasToString("$")
     );
     assertThatExceptionOfType(LensExecutionException.class)
         .isThrownBy(() -> result.override("some other string"));
@@ -38,14 +36,17 @@ class LensTest {
     var lens = Lens.create(Library.class)
         .select(Library::setAddress, Address.class)
         .select(Address::setCity, String.class);
-    var target = new Library().setAddress(new Address().setCity(value));
+    var target = new Library()
+        .setAddress(new Address()
+            .setCity(value)
+        );
 
-    assertThat(lens.path()).isEqualTo("$.address.city");
+    assertThat(lens.path()).hasToString("$.address.city");
 
     var result1 = lens.focus(target);
     assertAll(
         () -> assertThat(result1.value()).isEqualTo(value),
-        () -> assertThat(result1.path()).isEqualTo("$.address.city")
+        () -> assertThat(result1.path()).hasToString("$.address.city")
     );
 
     result1.override("Something Else");
@@ -55,7 +56,7 @@ class LensTest {
     var result2 = lens.focus(target);
     assertAll(
         () -> assertThat(result2.value()).isNull(),
-        () -> assertThat(result2.path()).isEqualTo("$.address.city")
+        () -> assertThat(result2.path()).hasToString("$.address.city")
     );
 
     result2.override("Something Else");
@@ -78,26 +79,26 @@ class LensTest {
             )))
         );
 
-    assertThat(lens.path()).isEqualTo("$.address.lines[*].text");
+    assertThat(lens.path()).hasToString("$.address.lines[*].text");
 
     var result1 = lens.focus(target);
     assertAll(
         () -> assertThat(result1.get(0).value()).isEqualTo("line1"),
-        () -> assertThat(result1.get(0).path()).isEqualTo("$.address.lines[0].text"),
+        () -> assertThat(result1.get(0).path()).hasToString("$.address.lines[0].text"),
         () -> {
           result1.get(0).override(overridden);
           assertThat(target.getAddress().getLines().get(0).getText()).isEqualTo(overridden);
         },
 
         () -> assertThat(result1.get(1).value()).isEqualTo("line2"),
-        () -> assertThat(result1.get(1).path()).isEqualTo("$.address.lines[1].text"),
+        () -> assertThat(result1.get(1).path()).hasToString("$.address.lines[1].text"),
         () -> {
           result1.get(1).override(overridden);
           assertThat(target.getAddress().getLines().get(1).getText()).isEqualTo(overridden);
         },
 
         () -> assertThat(result1.get(2).value()).isNull(),
-        () -> assertThat(result1.get(2).path()).isEqualTo("$.address.lines[2].text"),
+        () -> assertThat(result1.get(2).path()).hasToString("$.address.lines[2].text"),
         () -> {
           result1.get(2).override(overridden);
           assertThat(target.getAddress().getLines().get(2).getText()).isEqualTo(overridden);
@@ -127,12 +128,12 @@ class LensTest {
             )))
         );
 
-    assertThat(lens.path()).isEqualTo("$.address.lines[0].text");
+    assertThat(lens.path()).hasToString("$.address.lines[0].text");
 
     var result1 = lens.focus(target);
     assertAll(
         () -> assertThat(result1.value()).isEqualTo("line1"),
-        () -> assertThat(result1.path()).isEqualTo("$.address.lines[0].text"),
+        () -> assertThat(result1.path()).hasToString("$.address.lines[0].text"),
         () -> {
           result1.override(overridden);
           assertThat(target.getAddress().getLines().get(0).getText()).isEqualTo(overridden);
@@ -143,7 +144,7 @@ class LensTest {
     var result2 = lens.focus(target);
     assertAll(
         () -> assertThat(result2.value()).isEqualTo(null),
-        () -> assertThat(result2.path()).isEqualTo("$.address.lines[0].text"),
+        () -> assertThat(result2.path()).hasToString("$.address.lines[0].text"),
         () -> {
           result2.override(overridden);
           assertThat(target.getAddress().getLines().get(0).getText()).isEqualTo(overridden);
@@ -178,41 +179,41 @@ class LensTest {
                 .setPages(List.of())
         ));
 
-    assertThat(lens.path()).isEqualTo("$.books[*].pages[*].text");
+    assertThat(lens.path()).hasToString("$.books[*].pages[*].text");
 
     var result1 = lens.focus(target);
     assertThat(result1).hasSize(5);
     assertAll(
         () -> assertThat(result1.get(0).value()).isEqualTo("This is some text"),
-        () -> assertThat(result1.get(0).path()).isEqualTo("$.books[0].pages[0].text"),
+        () -> assertThat(result1.get(0).path()).hasToString("$.books[0].pages[0].text"),
         () -> {
           result1.get(0).override(overridden);
           assertThat(target.getBooks().get(0).getPages().get(0).getText()).isEqualTo(overridden);
         },
 
         () -> assertThat(result1.get(1).value()).isEqualTo("Some more text"),
-        () -> assertThat(result1.get(1).path()).isEqualTo("$.books[0].pages[1].text"),
+        () -> assertThat(result1.get(1).path()).hasToString("$.books[0].pages[1].text"),
         () -> {
           result1.get(1).override(overridden);
           assertThat(target.getBooks().get(0).getPages().get(1).getText()).isEqualTo(overridden);
         },
 
         () -> assertThat(result1.get(2).value()).isNull(),
-        () -> assertThat(result1.get(2).path()).isEqualTo("$.books[1].pages[0].text"),
+        () -> assertThat(result1.get(2).path()).hasToString("$.books[1].pages[0].text"),
         () -> {
           result1.get(2).override(overridden);
           assertThat(target.getBooks().get(1).getPages().get(0).getText()).isEqualTo(overridden);
         },
 
         () -> assertThat(result1.get(3).value()).isEqualTo("Text between some nulls"),
-        () -> assertThat(result1.get(3).path()).isEqualTo("$.books[1].pages[1].text"),
+        () -> assertThat(result1.get(3).path()).hasToString("$.books[1].pages[1].text"),
         () -> {
           result1.get(3).override(overridden);
           assertThat(target.getBooks().get(1).getPages().get(1).getText()).isEqualTo(overridden);
         },
 
         () -> assertThat(result1.get(4).value()).isNull(),
-        () -> assertThat(result1.get(4).path()).isEqualTo("$.books[1].pages[2].text"),
+        () -> assertThat(result1.get(4).path()).hasToString("$.books[1].pages[2].text"),
         () -> {
           result1.get(4).override(overridden);
           assertThat(target.getBooks().get(1).getPages().get(2).getText()).isEqualTo(overridden);
@@ -240,8 +241,8 @@ class LensTest {
         );
 
     var result = lens.focus(target);
-    
-    assertThat(result.path()).isEqualTo("$.address.city");
+
+    assertThat(result.path()).hasToString("$.address.city");
     assertThat(result.value()).isEqualTo(sameValue);
 
     result.override("a new value");

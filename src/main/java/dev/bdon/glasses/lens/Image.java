@@ -1,34 +1,35 @@
 package dev.bdon.glasses.lens;
 
+import dev.bdon.glasses.path.Path;
 import dev.bdon.glasses.util.Assert;
 
 public class Image<T> {
   private final Object target;
   private final T value;
-  private final Route route;
+  private final Path path;
   private final Lens<?, T> lens;
 
-  public Image(Object target, T value, Route route, Lens<?, ?> lens) {
+  public Image(Object target, T value, Path path, Lens<?, ?> lens) {
     this.target = Assert.nonNullArgument(target, "target");
     this.value = value;
-    this.route = Assert.nonNullArgument(route, "route");
-    this.lens = Assert.nonNullArgument((Lens<?, T>) lens, "lens");
+    this.path = Assert.nonNullArgument(path, "route");
+    this.lens = Assert.nonNullArgument(Lens.unchecked(lens), "lens");
   }
 
   public T value() {
     return value;
   }
 
-  public String path() {
-    return route.path();
+  public Path path() {
+    return path;
   }
 
   public Object target() {
     return target;
   }
 
-  public Route route() {
-    return route;
+  public Path route() {
+    return path;
   }
 
   public void override(T newValue) {

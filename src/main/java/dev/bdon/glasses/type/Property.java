@@ -1,28 +1,33 @@
 package dev.bdon.glasses.type;
 
 import dev.bdon.glasses.lens.LensInternalException;
+import dev.bdon.glasses.util.Default;
 import dev.bdon.glasses.util.Getter;
 import dev.bdon.glasses.util.ReflectionUtils;
 import dev.bdon.glasses.util.Setter;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class Property<I, O> implements IProperty<I, O> {
   private final String name;
+  private final List<Annotation> annotations;
   private final Getter<I, O> getter;
   private final Setter<I, O> setter;
   private final Class<O> type;
   private final List<Type> genericArguments;
 
-  public Property(String name, Getter<I, O> getter, Setter<I, O> setter, Class<O> type) {
-    this(name, getter, setter, type, List.of());
+  public Property(String name, List<Annotation> annotations, Getter<I, O> getter, Setter<I, O> setter, Class<O> type) {
+    this(name, annotations, getter, setter, type, List.of());
   }
 
-  public Property(String name, Getter<I, O> getter, Setter<I, O> setter, Class<O> type, List<Type> genericArguments) {
+  public Property(String name, List<Annotation> annotations, Getter<I, O> getter, Setter<I, O> setter, Class<O> type, List<Type> genericArguments) {
     this.name = name;
+    this.annotations = Default.toEmpty(annotations);
     this.getter = getter;
     this.setter = setter;
     this.type = type;
@@ -31,6 +36,20 @@ public class Property<I, O> implements IProperty<I, O> {
 
   public String name() {
     return name;
+  }
+
+  public List<Annotation> getAnnotations(Class<? extends Annotation> clazz) {
+    return annotations.stream()
+        .filter(a -> a.annotationType() == clazz)
+        .toList();
+  }
+
+  @SuppressWarnings("unchecked")
+  public <A extends Annotation> Optional<A> getFirstAnnotation(Class<? extends A> clazz) {
+    return annotations.stream()
+        .filter(a -> a.annotationType() == clazz)
+        .map(a -> (A) a)
+        .findFirst();
   }
 
   private List<Type> genericArguments() {
@@ -64,10 +83,10 @@ public class Property<I, O> implements IProperty<I, O> {
   public static <I, O> Property<I, O> from(JavaField field) {
     var genericType = field.actual().getGenericType();
     if (genericType instanceof ParameterizedType parameterizedType) {
-      return new Property<>(field.name(), field::get, field::set, field.type(), List.of(parameterizedType.getActualTypeArguments()));
+      return new Property<>(field.name(), field.annotations(), field::get, field::set, field.type(), List.of(parameterizedType.getActualTypeArguments()));
     }
     else if (genericType instanceof Class<?>) {
-      return new Property<>(field.name(), field::get, field::set, field.type());
+      return new Property<>(field.name(), field.annotations(), field::get, field::set, field.type());
     }
     else {
       throw new LensInternalException("Unhandled generic supertype %s", genericType);
