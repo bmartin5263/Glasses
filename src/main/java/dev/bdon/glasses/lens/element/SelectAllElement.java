@@ -8,8 +8,8 @@ import dev.bdon.glasses.path.DynamicNode;
 import dev.bdon.glasses.path.IndexFilterNode;
 import dev.bdon.glasses.path.IndexNode;
 import dev.bdon.glasses.path.PathNode;
-import dev.bdon.glasses.type.IProperty;
-import dev.bdon.glasses.type.IndexedProperty;
+import dev.bdon.glasses.type.ListItemProperty;
+import dev.bdon.glasses.type.Property;
 import dev.bdon.glasses.type.Type;
 import dev.bdon.glasses.util.Assert;
 
@@ -40,18 +40,18 @@ public class SelectAllElement<O> extends SelectionElement<List<O>, O> {
   }
 
   @Override
-  public PathNode pathNode() {
+  public PathNode pathNode(LensRuntime runtime) {
     return pathNode;
   }
 
   @Override
-  public IProperty<List<O>, O> property(Deque<DynamicNode> components) {
+  public Property<List<O>, O> property(Deque<DynamicNode> components) {
     if (components.isEmpty()) {
       throw new LensInternalException("No more dynamic components to determine the index");
     }
     var nextComponent = components.pop();
     if (nextComponent instanceof IndexNode indexComponent) {
-      return new IndexedProperty<>(itemType.javaClass(), indexComponent.index());
+      return new ListItemProperty<>(itemType.javaClass(), indexComponent.index());
     }
     throw new LensInternalException("Unhandled dynamic component type: %s", nextComponent.getClass());
   }

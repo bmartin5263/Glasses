@@ -18,7 +18,7 @@ public non-sealed class PolyLens<I, O> implements Lens<I, O> {
   }
 
   public List<Image<O>> focus(I target) {
-    return Lens.reify(LensImpl.focus(Lens.unchecked(this), target));
+    return LensImpl.reify(LensImpl.focus(LensImpl.unchecked(this), target));
   }
 
   @Override
@@ -47,7 +47,7 @@ public non-sealed class PolyLens<I, O> implements Lens<I, O> {
   }
 
   @Override
-  public Lens<I, O> configure(Consumer<LensConfigurerBuilder> configurer) {
+  public Lens<I, O> configure(Consumer<LensConfigurationBuilder> configurer) {
     return null;
   }
 

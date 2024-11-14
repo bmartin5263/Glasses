@@ -28,7 +28,7 @@ public non-sealed class MonoLens<I, O> implements Lens<I, O> {
 
   @Override
   public List<Image<O>> focusToList(I target) {
-    return Lens.reify(LensImpl.focus(Lens.unchecked(this), target));
+    return LensImpl.reify(LensImpl.focus(LensImpl.unchecked(this), target));
   }
 
   @Override
@@ -51,10 +51,10 @@ public non-sealed class MonoLens<I, O> implements Lens<I, O> {
     return context;
   }
 
-  public MonoLens<I, O> configure(Consumer<LensConfigurerBuilder> configurer) {
-    var builder = new LensConfigurerBuilder();
+  public MonoLens<I, O> configure(Consumer<LensConfigurationBuilder> configurer) {
+    var builder = new LensConfigurationBuilder();
     configurer.accept(builder);
-    return new MonoLens<>(context, outputType, new ConfigurationElement<>(builder.build()));
+    return new MonoLens<>(context, outputType, new ConfigurationElement<>(leaf, builder.build()));
   }
 
   @Override

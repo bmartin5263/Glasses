@@ -5,11 +5,11 @@ import dev.bdon.glasses.util.Assert;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class IndexedProperty<O> implements IProperty<List<O>, O> {
+public class ListItemProperty<O> implements Property<List<O>, O> {
   private final Class<O> type;
   private final int index;
 
-  public IndexedProperty(Class<O> type, int index) {
+  public ListItemProperty(Class<O> type, int index) {
     this.type = type;
     this.index = Assert.positiveOrZeroArgument(index, "index");
   }
@@ -42,8 +42,8 @@ public class IndexedProperty<O> implements IProperty<List<O>, O> {
   }
 
   @SuppressWarnings("unchecked")
-  public static <A, B> IndexedProperty<A> unchecked(IndexedProperty<B> property) {
-    return (IndexedProperty<A>) property;
+  public static <A, B> ListItemProperty<A> unchecked(ListItemProperty<B> property) {
+    return (ListItemProperty<A>) property;
   }
 
   public Stream<Class<?>> getClasses() {

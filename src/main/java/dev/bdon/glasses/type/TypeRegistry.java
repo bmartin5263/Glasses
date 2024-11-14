@@ -25,7 +25,7 @@ public class TypeRegistry {
 
   private void registerChildren(Type<?> type) {
     type.properties()
-        .flatMap(Property::getClasses)
+        .flatMap(FieldProperty::getClasses)
         .forEach(this::register);
   }
 

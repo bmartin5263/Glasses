@@ -4,8 +4,8 @@ import dev.bdon.glasses.lens.*;
 import dev.bdon.glasses.path.DynamicNode;
 import dev.bdon.glasses.path.IndexNode;
 import dev.bdon.glasses.path.PathNode;
-import dev.bdon.glasses.type.IProperty;
-import dev.bdon.glasses.type.IndexedProperty;
+import dev.bdon.glasses.type.ListItemProperty;
+import dev.bdon.glasses.type.Property;
 import dev.bdon.glasses.type.Type;
 import dev.bdon.glasses.util.Assert;
 
@@ -13,7 +13,7 @@ import java.util.Deque;
 import java.util.List;
 
 public class SelectAtElement<O> extends SelectionElement<List<O>, O> {
-  private final IndexedProperty<O> property;
+  private final ListItemProperty<O> property;
   private final PathNode pathNode;
 
   public SelectAtElement(
@@ -22,7 +22,7 @@ public class SelectAtElement<O> extends SelectionElement<List<O>, O> {
       int index
   ) {
     super(parent);
-    this.property = new IndexedProperty<>(listItemType.javaClass(), index);
+    this.property = new ListItemProperty<>(listItemType.javaClass(), index);
     this.pathNode = new IndexNode(index);
   }
 
@@ -48,12 +48,12 @@ public class SelectAtElement<O> extends SelectionElement<List<O>, O> {
   }
 
   @Override
-  public PathNode pathNode() {
+  public PathNode pathNode(LensRuntime runtime) {
     return pathNode;
   }
 
   @Override
-  public IProperty<List<O>, O> property(Deque<DynamicNode> components) {
+  public Property<List<O>, O> property(Deque<DynamicNode> components) {
     return property;
   }
 }

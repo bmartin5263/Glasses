@@ -9,11 +9,11 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class Address {
-  @CustomPath("myPath")
-  private String city;
   private String state;
   private String zipcode;
+  @CustomPath("myLines")
   private List<Line> lines;
+  private String city;
 
   public List<Line> getLines() {
     if (lines == null) {

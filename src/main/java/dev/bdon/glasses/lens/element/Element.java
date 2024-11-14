@@ -3,6 +3,7 @@ package dev.bdon.glasses.lens.element;
 import dev.bdon.glasses.lens.Blur;
 import dev.bdon.glasses.lens.Blurs;
 import dev.bdon.glasses.lens.LensRuntime;
+import dev.bdon.glasses.path.Path;
 
 public abstract sealed class Element<I, O> permits PathlessElement, SelectionElement {
   private final Element<Object, Object> parent;
@@ -20,6 +21,8 @@ public abstract sealed class Element<I, O> permits PathlessElement, SelectionEle
   }
 
   public abstract Blurs<O> apply(LensRuntime runtime, Blur<I> blur);
+
+  public abstract void buildPath(LensRuntime runtime, Path path);
 
   public boolean isSelectionElement() {
     return this instanceof SelectionElement<I,O>;

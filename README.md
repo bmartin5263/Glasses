@@ -1,5 +1,5 @@
 # _Glasses_
-A lens-like library for Java
+A lens library for Java
 
 ```java
 var lens = Lens.create(Library.class)
@@ -31,10 +31,10 @@ Maybe! As long as every class in the object model:
   - `TODO` Possibly optional for list fields if they are lazy initialized
 - Has a no-argument constructor
 
-The reason for needing a setter for every field is this is used by the library to find the associated field for a getter/setter combo by invoking the setter with a dummy value and then finding that dummy value reflectively
+The reason for needing a setter for every field is this is used by the library to find the associated java field for a getter/setter combo by invoking the setter with a dummy value and then finding that dummy value reflectively
 
 The reason for the no-argument constructor is that many operations in the Lens library require a no-arg constructor on the class for reasons like
 - Default constructing intermediate nodes in an object graph when overwriting a property whose parent is not yet created
 - Injecting a dummy object into the field of another object and then using reflection to determine which field it got set to. Each dummy must be unique
 
-Essentially you need basic data classes
+Essentially you need mutable data classes with no business logic.

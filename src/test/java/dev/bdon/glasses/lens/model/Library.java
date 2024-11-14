@@ -9,6 +9,7 @@ import java.util.Map;
 @Data
 @Accessors(chain = true)
 public class Library {
+  @CustomPath("myAddress")
   private Address address;
   private List<Media> media;
   private List<Book> books;

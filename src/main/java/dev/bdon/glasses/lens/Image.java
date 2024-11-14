@@ -13,7 +13,7 @@ public class Image<T> {
     this.target = Assert.nonNullArgument(target, "target");
     this.value = value;
     this.path = Assert.nonNullArgument(path, "route");
-    this.lens = Assert.nonNullArgument(Lens.unchecked(lens), "lens");
+    this.lens = Assert.nonNullArgument(LensImpl.unchecked(lens), "lens");
   }
 
   public T value() {

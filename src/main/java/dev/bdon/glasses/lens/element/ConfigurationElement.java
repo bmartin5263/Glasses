@@ -2,25 +2,30 @@ package dev.bdon.glasses.lens.element;
 
 import dev.bdon.glasses.lens.Blur;
 import dev.bdon.glasses.lens.Blurs;
-import dev.bdon.glasses.lens.LensConfigurer;
+import dev.bdon.glasses.lens.LensConfiguration;
 import dev.bdon.glasses.lens.LensRuntime;
+import dev.bdon.glasses.path.Path;
 
 public class ConfigurationElement<I> extends PathlessElement<I, I> {
-  private final LensConfigurer lensConfigurer;
+  private final LensConfiguration lensConfiguration;
 
-  public ConfigurationElement(LensConfigurer lensConfigurer) {
-    this.lensConfigurer = lensConfigurer;
+  public ConfigurationElement(LensConfiguration lensConfiguration) {
+    this.lensConfiguration = lensConfiguration;
   }
 
-  public ConfigurationElement(Element<?, ?> parent, LensConfigurer lensConfigurer) {
+  public ConfigurationElement(Element<?, ?> parent, LensConfiguration lensConfiguration) {
     super(parent);
-    this.lensConfigurer = lensConfigurer;
+    this.lensConfiguration = lensConfiguration;
   }
 
   @Override
   public Blurs<I> apply(LensRuntime runtime, Blur<I> blur) {
-    lensConfigurer.accept(runtime);
+    lensConfiguration.accept(runtime);
     return Blurs.of(blur);
   }
 
+  @Override
+  public void buildPath(LensRuntime runtime, Path path) {
+    lensConfiguration.accept(runtime);
+  }
 }

@@ -3,7 +3,8 @@ package dev.bdon.glasses.lens;
 import dev.bdon.glasses.lens.element.SelectAllElement;
 import dev.bdon.glasses.lens.element.SelectAtElement;
 import dev.bdon.glasses.lens.element.SelectElement;
-import dev.bdon.glasses.type.Property;
+import dev.bdon.glasses.path.Path;
+import dev.bdon.glasses.type.FieldProperty;
 import dev.bdon.glasses.type.Type;
 import dev.bdon.glasses.util.Assert;
 import dev.bdon.glasses.util.Setter;
@@ -15,8 +16,7 @@ class LensImpl {
   static List<Image<Object>> focus(Lens<Object, Object> lens, Object target) {
     Assert.nonNullArgument(target, "target", LensInternalException::new);
 
-    var runtime = new LensRuntime(lens);
-    lens.context().defaultLensConfiguration().accept(runtime);
+    var runtime = lens.context().createRuntime(lens);
 
     var blurs = Blurs.of(Blur.root(lens, target));
 
@@ -32,6 +32,18 @@ class LensImpl {
     return blurs.stream()
         .map(b -> b.toImage(target))
         .toList();
+  }
+
+  static Path pathOf(Lens<?, ?> lens) {
+    var runtime = lens.context().createRuntime(lens);
+
+    var path = new Path();
+    var elements = LensUtils.reverseElementChain(lens.leaf()).toList();
+    for (var element : elements) {
+      element.buildPath(runtime, path);
+    }
+
+    return path;
   }
 
   static <O> void override(InternalLens<O> lens, Image<O> image, O newValue) {
@@ -94,7 +106,7 @@ class LensImpl {
   ) {
     O target = LensUtils.newTracer(lens.outputType());
     Class<List<X>> listClass = listClass();
-    Property<O, List<X>> listProperty = lens.context().findProperty(target, setter, listClass);
+    FieldProperty<O, List<X>> listProperty = lens.context().findProperty(target, setter, listClass);
     Type<X> listItemType = lens.context().findType(type);
     SelectAllElement<X> next = new SelectAllElement<>(new SelectElement<>(lens.leaf(), listProperty), listItemType);
     return new PolyLens<>(lens.context(), type, next);
@@ -103,5 +115,15 @@ class LensImpl {
   @SuppressWarnings("unchecked")
   static <T> Class<List<T>> listClass() {
     return (Class<List<T>>)(Class<?>) List.class;
+  }
+
+  @SuppressWarnings("unchecked")
+  static <O> List<Image<O>> reify(List<Image<Object>> images) {
+    return (List<Image<O>>) (List<?>) images;
+  }
+
+  @SuppressWarnings("unchecked")
+  static <A, B, C, D> Lens<A, B> unchecked(Lens<C, D> lens) {
+    return (Lens<A, B>) lens;
   }
 }

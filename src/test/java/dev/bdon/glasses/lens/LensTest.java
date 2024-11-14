@@ -1,6 +1,7 @@
 package dev.bdon.glasses.lens;
 
 import dev.bdon.glasses.lens.model.*;
+import dev.bdon.glasses.type.FieldProperty;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -250,5 +251,35 @@ class LensTest {
     assertThat(target.getAddress().getCity()).isEqualTo("a new value");
     assertThat(target.getAddress().getState()).isEqualTo(sameValue);
     assertThat(target.getAddress().getZipcode()).isEqualTo(sameValue);
+  }
+
+  @Test
+  void configure_fieldNameExtractor_shouldAffectPaths() {
+    var lens = Lens
+        .configureRoot(c -> c
+            .fieldNameExtractor(p -> p.getAnnotation(CustomPath.class)
+                .map(CustomPath::value)
+                .orElse(p.name())
+            )
+        )
+        .create(Library.class)
+        .select(Library::setAddress, Address.class)
+        .selectFirst(Address::setLines, Line.class)
+        .configure(c -> c
+            .fieldNameExtractor(FieldProperty::name)
+        )
+        .select(Line::setText, String.class);
+    var target = new Library()
+        .setAddress(new Address()
+            .setLines(new ArrayList<>(List.of(
+                new Line().setText("line1"),
+                new Line().setText("line2")
+            )))
+        );
+
+    var result = lens.focus(target);
+
+    assertThat(result.value()).isEqualTo("line1");
+    assertThat(result.path()).hasToString("$.myAddress.myLines[0].text");
   }
 }

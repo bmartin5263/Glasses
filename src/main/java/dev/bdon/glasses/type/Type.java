@@ -12,29 +12,29 @@ import java.util.stream.Stream;
 
 public class Type<T> {
   private final Class<T> clazz;
-  private final Map<Class<?>, List<Property<T, Object>>> properties;
+  private final Map<Class<?>, List<FieldProperty<T, Object>>> propertiesByType;
 
-  public Type(Class<T> clazz, List<Property<T, Object>> properties) {
+  public Type(Class<T> clazz, List<FieldProperty<T, Object>> properties) {
     this.clazz = clazz;
-    this.properties = properties.stream()
-        .collect(Collectors.groupingBy(Property::type));
+    this.propertiesByType = properties.stream()
+        .collect(Collectors.groupingBy(FieldProperty::type));
   }
 
-  public Stream<Property<T, Object>> properties() {
-    return properties.values().stream().flatMap(List::stream);
+  public Stream<FieldProperty<T, Object>> properties() {
+    return propertiesByType.values().stream().flatMap(List::stream);
   }
 
   public static <T> Type<T> from(Class<T> clazz) {
     var properties = ReflectionUtils.getFields(clazz).stream()
-        .map(Property::<T, Object>from)
+        .map(FieldProperty::<T, Object>from)
         .toList();
     return new Type<>(clazz, properties);
   }
 
-  public <X> Property<T, X> findProperty(T target, Setter<T, X> setter, Class<X> propertyType) {
+  public <X> FieldProperty<T, X> findProperty(T target, Setter<T, X> setter, Class<X> propertyType) {
     var tracer = LensUtils.newTracer(propertyType);
-    var possible = properties.get(propertyType).stream()
-        .map(p -> new PossibleProperty<>(Property.unchecked(p), (X) p.get(target)))
+    var possible = propertiesByType.get(propertyType).stream()
+        .map(p -> new PossibleProperty<>(FieldProperty.unchecked(p), (X) p.get(target)))
         .toList();
 
     setter.set(target, tracer);
@@ -43,7 +43,7 @@ public class Type<T> {
       var value = property.get(target);
       property.resetOriginalValue(target);
       if (value == tracer) {
-        return Property.unchecked(property.actual());
+        return FieldProperty.unchecked(property.actual());
       }
     }
 
@@ -63,7 +63,7 @@ public class Type<T> {
     return clazz;
   }
 
-  private record PossibleProperty<I, O>(Property<I, O> actual, O originalValue) {
+  private record PossibleProperty<I, O>(FieldProperty<I, O> actual, O originalValue) {
     public Object get(I target) {
       return actual.get(target);
     }
