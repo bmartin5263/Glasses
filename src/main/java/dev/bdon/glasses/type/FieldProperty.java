@@ -39,14 +39,6 @@ public class FieldProperty<I, O> implements Property<I, O> {
   }
 
   @SuppressWarnings("unchecked")
-  public <A extends Annotation> List<? extends A> getAnnotations(Class<? extends A> clazz) {
-    return annotations.stream()
-        .filter(a -> a.annotationType() == clazz)
-        .map(a -> (A) a)
-        .toList();
-  }
-
-  @SuppressWarnings("unchecked")
   public <A extends Annotation> Optional<A> getAnnotation(Class<? extends A> clazz) {
     return annotations.stream()
         .filter(a -> a.annotationType() == clazz)

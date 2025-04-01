@@ -41,11 +41,6 @@ public class ListItemProperty<O> implements Property<List<O>, O> {
     target.set(index, newValue);
   }
 
-  @SuppressWarnings("unchecked")
-  public static <A, B> ListItemProperty<A> unchecked(ListItemProperty<B> property) {
-    return (ListItemProperty<A>) property;
-  }
-
   public Stream<Class<?>> getClasses() {
     return Stream.of(type);
   }

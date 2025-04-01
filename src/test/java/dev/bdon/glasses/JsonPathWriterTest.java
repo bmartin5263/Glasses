@@ -5,6 +5,8 @@ import dev.bdon.glasses.path.JsonPathWriter;
 import dev.bdon.glasses.path.Path;
 import org.junit.jupiter.api.Test;
 
+import java.util.regex.Pattern;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class JsonPathWriterTest {
@@ -31,6 +33,18 @@ class JsonPathWriterTest {
     var result = subject.write(path);
 
     assertThat(result).isEqualTo("$['this-has-a-special-character']['so{does}this']");
+  }
+
+  @Test
+  void writePath_withDifferentSpecialCharacters() {
+    var subject = new JsonPathWriter(false, Pattern.compile("r"));
+    var path = new Path()
+        .append(new FieldNode("hello"))
+        .append(new FieldNode("world"));
+
+    var result = subject.write(path);
+
+    assertThat(result).isEqualTo(".hello['world']");
   }
 
 }

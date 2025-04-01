@@ -1,7 +1,6 @@
 package dev.bdon.glasses.util;
 
 import dev.bdon.glasses.type.JavaField;
-import dev.bdon.glasses.lens.LensInternalException;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -45,30 +44,6 @@ public class ReflectionUtils {
     for (var field : clazz.getDeclaredFields()) {
       fields.add(new JavaField(field));
     }
-  }
-
-  public static JavaField findFieldWithValueOn(Object target, Object value) {
-    JavaField found = null;
-    var fields = getFields(target.getClass());
-    for (var field : fields) {
-      var fieldValue = field.get(target);
-      if (fieldValue == value) {
-        if (found != null) {
-          throw new LensInternalException(
-              "Found multiple field containing value %s on object type %s. %s : %s",
-              value, target.getClass(), field, found
-          );
-        }
-        found = field;
-      }
-    }
-    if (found != null) {
-      return found;
-    }
-    throw new LensInternalException(
-        "Unable to find field containing value %s on object type %s",
-        value, target.getClass()
-    );
   }
 
   public static boolean isPrimitive(Class<?> clazz) {
