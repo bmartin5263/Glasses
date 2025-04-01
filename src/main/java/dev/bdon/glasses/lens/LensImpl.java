@@ -14,7 +14,7 @@ import java.util.List;
 class LensImpl {
 
   static List<Image<Object>> focus(Lens<Object, Object> lens, Object target) {
-    Assert.nonNullArgument(target, "target", LensInternalException::new);
+    Assert.nonNullArgument(target, LensInternalException::new, "target");
 
     var runtime = lens.context().createRuntime(lens);
 
@@ -47,8 +47,8 @@ class LensImpl {
   }
 
   static <O> void override(InternalLens<O> lens, Image<O> image, O newValue) {
-    Assert.nonNullArgument(lens, "lens", LensInternalException::new);
-    Assert.nonNullArgument(image, "image", LensInternalException::new);
+    Assert.nonNullArgument(lens, LensInternalException::new, "lens");
+    Assert.nonNullArgument(image, LensInternalException::new, "image");
 
     var current = image.target();
     var properties = lens.properties(image.route()).toList();

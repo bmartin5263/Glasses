@@ -1,7 +1,10 @@
-package dev.bdon.glasses.lens;
+package dev.bdon.glasses;
 
-import dev.bdon.glasses.lens.model.*;
+import dev.bdon.glasses.lens.Lens;
+import dev.bdon.glasses.lens.LensExecutionException;
+import dev.bdon.glasses.model.*;
 import dev.bdon.glasses.type.FieldProperty;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
@@ -37,6 +40,7 @@ class LensTest {
     var lens = Lens.create(Library.class)
         .select(Library::setAddress, Address.class)
         .select(Address::setCity, String.class);
+
     var target = new Library()
         .setAddress(new Address()
             .setCity(value)
@@ -185,39 +189,39 @@ class LensTest {
     var result1 = lens.focus(target);
     assertThat(result1).hasSize(5);
     assertAll(
-        () -> assertThat(result1.get(0).value()).isEqualTo("This is some text"),
+        () -> Assertions.assertThat(result1.get(0).value()).isEqualTo("This is some text"),
         () -> assertThat(result1.get(0).path()).hasToString("$.books[0].pages[0].text"),
         () -> {
           result1.get(0).override(overridden);
-          assertThat(target.getBooks().get(0).getPages().get(0).getText()).isEqualTo(overridden);
+          Assertions.assertThat(target.getBooks().get(0).getPages().get(0).getText()).isEqualTo(overridden);
         },
 
-        () -> assertThat(result1.get(1).value()).isEqualTo("Some more text"),
+        () -> Assertions.assertThat(result1.get(1).value()).isEqualTo("Some more text"),
         () -> assertThat(result1.get(1).path()).hasToString("$.books[0].pages[1].text"),
         () -> {
           result1.get(1).override(overridden);
-          assertThat(target.getBooks().get(0).getPages().get(1).getText()).isEqualTo(overridden);
+          Assertions.assertThat(target.getBooks().get(0).getPages().get(1).getText()).isEqualTo(overridden);
         },
 
-        () -> assertThat(result1.get(2).value()).isNull(),
+        () -> Assertions.assertThat(result1.get(2).value()).isNull(),
         () -> assertThat(result1.get(2).path()).hasToString("$.books[1].pages[0].text"),
         () -> {
           result1.get(2).override(overridden);
-          assertThat(target.getBooks().get(1).getPages().get(0).getText()).isEqualTo(overridden);
+          Assertions.assertThat(target.getBooks().get(1).getPages().get(0).getText()).isEqualTo(overridden);
         },
 
-        () -> assertThat(result1.get(3).value()).isEqualTo("Text between some nulls"),
+        () -> Assertions.assertThat(result1.get(3).value()).isEqualTo("Text between some nulls"),
         () -> assertThat(result1.get(3).path()).hasToString("$.books[1].pages[1].text"),
         () -> {
           result1.get(3).override(overridden);
-          assertThat(target.getBooks().get(1).getPages().get(1).getText()).isEqualTo(overridden);
+          Assertions.assertThat(target.getBooks().get(1).getPages().get(1).getText()).isEqualTo(overridden);
         },
 
-        () -> assertThat(result1.get(4).value()).isNull(),
+        () -> Assertions.assertThat(result1.get(4).value()).isNull(),
         () -> assertThat(result1.get(4).path()).hasToString("$.books[1].pages[2].text"),
         () -> {
           result1.get(4).override(overridden);
-          assertThat(target.getBooks().get(1).getPages().get(2).getText()).isEqualTo(overridden);
+          Assertions.assertThat(target.getBooks().get(1).getPages().get(2).getText()).isEqualTo(overridden);
         }
     );
 
@@ -256,7 +260,7 @@ class LensTest {
   @Test
   void configure_fieldNameExtractor_shouldAffectPaths() {
     var lens = Lens
-        .configureRoot(c -> c
+        .configureLensRoot(c -> c
             .fieldNameExtractor(p -> p.getAnnotation(CustomPath.class)
                 .map(CustomPath::value)
                 .orElse(p.name())

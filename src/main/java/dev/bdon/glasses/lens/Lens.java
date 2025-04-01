@@ -19,8 +19,8 @@ public sealed interface Lens<I, O> permits MonoLens, PolyLens {
   void override(Image<O> image, O newValue);
 
   // Factory Methods
-  static ConfiguredContext configureRoot(Consumer<LensConfigurationBuilder> configurer) {
-    return LensContext.DEFAULT.configure(configurer);
+  static ConfiguredContext configureLensRoot(Consumer<LensConfigurationBuilder> configurer) {
+    return LensContext.DEFAULT.configureLensRoot(configurer);
   }
 
   static <T> MonoLens<T, T> create(Class<T> type) {
@@ -39,7 +39,7 @@ public sealed interface Lens<I, O> permits MonoLens, PolyLens {
 
   // Accessors
   LensContext context();
-  <X> Element<X, O> leaf(); // TODO - hide from interface
+  <X> Element<X, O> leaf();
   Class<O> outputType();
 
   default Path path() {

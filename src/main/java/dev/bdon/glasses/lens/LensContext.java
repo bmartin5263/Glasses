@@ -28,7 +28,7 @@ public class LensContext {
     return new MonoLens<>(this, type, new ConfigurationElement<>(configuration));
   }
 
-  public ConfiguredContext configure(Consumer<LensConfigurationBuilder> configurer) {
+  public ConfiguredContext configureLensRoot(Consumer<LensConfigurationBuilder> configurer) {
     var builder = new LensConfigurationBuilder();
     configurer.accept(builder);
     return new ConfiguredContext(this, builder.build());

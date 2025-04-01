@@ -11,7 +11,7 @@ public class ListItemProperty<O> implements Property<List<O>, O> {
 
   public ListItemProperty(Class<O> type, int index) {
     this.type = type;
-    this.index = Assert.positiveOrZeroArgument(index, "index");
+    this.index = Assert.nonNegativeArgument(index, "index");
   }
 
   @Override

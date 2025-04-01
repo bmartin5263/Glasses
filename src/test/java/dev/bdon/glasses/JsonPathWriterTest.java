@@ -1,5 +1,8 @@
-package dev.bdon.glasses.path;
+package dev.bdon.glasses;
 
+import dev.bdon.glasses.path.FieldNode;
+import dev.bdon.glasses.path.JsonPathWriter;
+import dev.bdon.glasses.path.Path;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;

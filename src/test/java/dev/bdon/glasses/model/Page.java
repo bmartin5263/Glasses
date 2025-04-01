@@ -1,9 +1,10 @@
-package dev.bdon.glasses.lens.model;
+package dev.bdon.glasses.model;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 @Data
 @Accessors(chain = true)
-public class Department {
+public class Page {
+  private String text;
 }
