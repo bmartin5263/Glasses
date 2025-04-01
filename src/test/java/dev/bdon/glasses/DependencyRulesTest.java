@@ -10,20 +10,20 @@ public class DependencyRulesTest {
 
     @ArchTest
     public void noClassesInPackageADependOnClassesInPackageB(JavaClasses importedClasses) {
-        ArchRuleDefinition.noClasses()
-            .that().resideInAPackage("dev.bdon.glasses.path..")
+        ArchRuleDefinition
+            .noClasses().that().resideInAPackage("dev.bdon.glasses.path..")
             .should().dependOnClassesThat().resideInAPackage("dev.bdon.glasses.lens..")
             .andShould().dependOnClassesThat().resideInAPackage("dev.bdon.glasses.type..")
             .check(importedClasses);
 
-        ArchRuleDefinition.noClasses()
-            .that().resideInAPackage("dev.bdon.glasses.type..")
+        ArchRuleDefinition
+            .noClasses().that().resideInAPackage("dev.bdon.glasses.type..")
             .should().dependOnClassesThat().resideInAPackage("dev.bdon.glasses.lens..")
             .andShould().dependOnClassesThat().resideInAPackage("dev.bdon.glasses.path..")
             .check(importedClasses);
 
-        ArchRuleDefinition.noClasses()
-            .that().resideInAPackage("dev.bdon.glasses.util..")
+        ArchRuleDefinition
+            .noClasses().that().resideInAPackage("dev.bdon.glasses.util..")
             .should().dependOnClassesThat().resideInAPackage("dev.bdon.glasses.lens..")
             .andShould().dependOnClassesThat().resideInAPackage("dev.bdon.glasses.path..")
             .andShould().dependOnClassesThat().resideInAPackage("dev.bdon.glasses.type..")

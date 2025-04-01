@@ -1,10 +1,7 @@
 package dev.bdon.glasses.type;
 
-import dev.bdon.glasses.lens.LensInternalException;
-import dev.bdon.glasses.util.Default;
-import dev.bdon.glasses.util.Getter;
+import dev.bdon.glasses.util.LensInternalException;
 import dev.bdon.glasses.util.ReflectionUtils;
-import dev.bdon.glasses.util.Setter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
@@ -14,33 +11,25 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 public class FieldProperty<I, O> implements Property<I, O> {
-  private final String name;
-  private final List<Annotation> annotations;
-  private final Getter<I, O> getter;
-  private final Setter<I, O> setter;
-  private final Class<O> type;
+  private final JavaField javaField;
   private final List<Type> genericArguments;
 
-  public FieldProperty(String name, List<Annotation> annotations, Getter<I, O> getter, Setter<I, O> setter, Class<O> type) {
-    this(name, annotations, getter, setter, type, List.of());
+  public FieldProperty(JavaField javaField) {
+    this(javaField, List.of());
   }
 
-  public FieldProperty(String name, List<Annotation> annotations, Getter<I, O> getter, Setter<I, O> setter, Class<O> type, List<Type> genericArguments) {
-    this.name = name;
-    this.annotations = Default.toEmpty(annotations);
-    this.getter = getter;
-    this.setter = setter;
-    this.type = type;
+  public FieldProperty(JavaField javaField, List<Type> genericArguments) {
+    this.javaField = javaField;
     this.genericArguments = genericArguments;
   }
 
   public String name() {
-    return name;
+    return javaField.name();
   }
 
   @SuppressWarnings("unchecked")
   public <A extends Annotation> Optional<A> getAnnotation(Class<? extends A> clazz) {
-    return annotations.stream()
+    return javaField.annotations().stream()
         .filter(a -> a.annotationType() == clazz)
         .map(a -> (A) a)
         .findFirst();
@@ -52,21 +41,21 @@ public class FieldProperty<I, O> implements Property<I, O> {
 
   @Override
   public O get(I target) {
-    return getter.get(target);
+    return javaField.get(target);
   }
 
   @Override
   public void set(I target, O newValue) {
-    setter.set(target, newValue);
+    javaField.set(target, newValue);
   }
 
   @Override
   public Class<O> type() {
-    return type;
+    return javaField.type();
   }
 
   private boolean isCollection() {
-    return ReflectionUtils.isCollection(type);
+    return ReflectionUtils.isCollection(type());
   }
 
   @SuppressWarnings("unchecked")
@@ -77,17 +66,16 @@ public class FieldProperty<I, O> implements Property<I, O> {
   public static <I, O> FieldProperty<I, O> from(JavaField field) {
     var genericType = field.actual().getGenericType();
     if (genericType instanceof ParameterizedType parameterizedType) {
-      return new FieldProperty<>(field.name(), field.annotations(), field::get, field::set, field.type(), List.of(parameterizedType.getActualTypeArguments()));
+      return new FieldProperty<>(field, List.of(parameterizedType.getActualTypeArguments()));
     }
     else if (genericType instanceof Class<?>) {
-      return new FieldProperty<>(field.name(), field.annotations(), field::get, field::set, field.type());
+      return new FieldProperty<>(field);
     }
     else {
-      throw new LensInternalException("Unhandled generic supertype %s", genericType);
+      throw new LensInternalException("Generic fields not supported: %s", field);
     }
   }
 
-  @Override
   public Stream<Class<?>> getClasses() {
     var result = Stream.<Class<?>>builder();
     if (isCollection()) {
@@ -99,5 +87,13 @@ public class FieldProperty<I, O> implements Property<I, O> {
       result.add(type());
     }
     return result.build();
+  }
+
+  @Override
+  public String toString() {
+    return "FieldProperty[" +
+        "javaField=" + javaField +
+        ", genericArguments=" + genericArguments +
+        ']';
   }
 }

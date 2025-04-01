@@ -1,7 +1,7 @@
 package dev.bdon.glasses.type;
 
-import dev.bdon.glasses.lens.LensInternalException;
 import dev.bdon.glasses.util.Assert;
+import dev.bdon.glasses.util.LensInternalException;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -42,5 +42,11 @@ public record JavaField(Field actual) {
     } catch (IllegalAccessException e) {
       throw new LensInternalException("Unable to write field %s of %s", actual, actual.getDeclaringClass());
     }
+  }
+
+  @Override
+  public String toString() {
+    return "JavaField[class=%s, name=%s, type=%s]"
+        .formatted(actual.getDeclaringClass(), actual.getName(), actual.getGenericType());
   }
 }

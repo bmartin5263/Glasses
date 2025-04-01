@@ -3,12 +3,12 @@ package dev.bdon.glasses.lens.element;
 import dev.bdon.glasses.lens.Blur;
 import dev.bdon.glasses.lens.Blurs;
 import dev.bdon.glasses.lens.LensRuntime;
-import dev.bdon.glasses.lens.LensUtils;
 import dev.bdon.glasses.path.DynamicNode;
 import dev.bdon.glasses.path.FieldNode;
 import dev.bdon.glasses.path.PathNode;
 import dev.bdon.glasses.type.FieldProperty;
 import dev.bdon.glasses.type.Property;
+import dev.bdon.glasses.type.Tracers;
 import dev.bdon.glasses.util.Assert;
 
 import java.util.Deque;
@@ -40,7 +40,7 @@ public class SelectElement<I, O> extends SelectionElement<I, O> {
   }
 
   private Blur<O> kill(Blur<I> blur, PathNode pathNode) {
-    O tracer = LensUtils.newTracer(property.type());
+    O tracer = Tracers.newTracer(property.type());
     return new Blur<>(blur.lens(), tracer, blur.path().append(pathNode), true);
   }
 

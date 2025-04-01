@@ -3,7 +3,6 @@ package dev.bdon.glasses.type;
 import dev.bdon.glasses.util.Assert;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public class ListItemProperty<O> implements Property<List<O>, O> {
   private final Class<O> type;
@@ -41,7 +40,4 @@ public class ListItemProperty<O> implements Property<List<O>, O> {
     target.set(index, newValue);
   }
 
-  public Stream<Class<?>> getClasses() {
-    return Stream.of(type);
-  }
 }

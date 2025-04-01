@@ -2,6 +2,7 @@ package dev.bdon.glasses.lens;
 
 import dev.bdon.glasses.type.FieldProperty;
 import dev.bdon.glasses.util.Assert;
+import dev.bdon.glasses.util.LensConfigurationException;
 
 public class LensRuntime {
   private final Lens<?, ?> lens;

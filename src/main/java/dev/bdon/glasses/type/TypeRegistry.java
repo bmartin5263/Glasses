@@ -1,6 +1,6 @@
 package dev.bdon.glasses.type;
 
-import dev.bdon.glasses.lens.LensInternalException;
+import dev.bdon.glasses.util.LensInternalException;
 import dev.bdon.glasses.util.ReflectionUtils;
 
 import java.util.Map;

@@ -1,9 +1,9 @@
 package dev.bdon.glasses;
 
 import dev.bdon.glasses.lens.Lens;
-import dev.bdon.glasses.lens.LensExecutionException;
 import dev.bdon.glasses.model.*;
 import dev.bdon.glasses.type.FieldProperty;
+import dev.bdon.glasses.util.LensExecutionException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

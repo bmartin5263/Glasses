@@ -1,7 +1,5 @@
 package dev.bdon.glasses.util;
 
-import dev.bdon.glasses.lens.LensInternalException;
-
 import java.util.function.Function;
 
 /**

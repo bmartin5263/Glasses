@@ -1,4 +1,4 @@
-package dev.bdon.glasses.lens;
+package dev.bdon.glasses.util;
 
 public class LensExecutionException extends RuntimeException {
   public LensExecutionException(String message) {

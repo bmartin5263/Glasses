@@ -5,8 +5,11 @@ import dev.bdon.glasses.lens.element.SelectAtElement;
 import dev.bdon.glasses.lens.element.SelectElement;
 import dev.bdon.glasses.path.Path;
 import dev.bdon.glasses.type.FieldProperty;
+import dev.bdon.glasses.type.Tracers;
 import dev.bdon.glasses.type.Type;
 import dev.bdon.glasses.util.Assert;
+import dev.bdon.glasses.util.LensExecutionException;
+import dev.bdon.glasses.util.LensInternalException;
 import dev.bdon.glasses.util.Setter;
 
 import java.util.List;
@@ -65,7 +68,7 @@ class LensImpl {
       else {
         var next = property.get(current);
         if (next == null) {
-          next = LensUtils.newTracer(property.type());
+          next = Tracers.newTracer(property.type());
           property.set(current, next);
         }
         current = next;
@@ -79,7 +82,7 @@ class LensImpl {
       Class<X> type,
       LensConstructor<I, X, L> constructor
   ) {
-    var target = LensUtils.newTracer(lens.outputType());
+    var target = Tracers.newTracer(lens.outputType());
     var property = lens.context().findProperty(target, setter, type);
     var next = new SelectElement<>(lens.leaf(), property);
     return constructor.construct(lens.context(), type, next);
@@ -91,7 +94,7 @@ class LensImpl {
       Class<X> type,
       LensConstructor<I, X, L> constructor
   ) {
-    var target = LensUtils.newTracer(lens.outputType());
+    var target = Tracers.newTracer(lens.outputType());
     var listClass = LensImpl.<X>listClass();
     var listItemType = lens.context().findType(type);
     var listProperty = lens.context().findProperty(target, setter, listClass);
@@ -104,7 +107,7 @@ class LensImpl {
       Setter<O, List<X>> setter,
       Class<X> type
   ) {
-    O target = LensUtils.newTracer(lens.outputType());
+    O target = Tracers.newTracer(lens.outputType());
     Class<List<X>> listClass = listClass();
     FieldProperty<O, List<X>> listProperty = lens.context().findProperty(target, setter, listClass);
     Type<X> listItemType = lens.context().findType(type);

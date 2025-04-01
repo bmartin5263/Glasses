@@ -2,7 +2,6 @@ package dev.bdon.glasses.lens.element;
 
 import dev.bdon.glasses.lens.Blur;
 import dev.bdon.glasses.lens.Blurs;
-import dev.bdon.glasses.lens.LensInternalException;
 import dev.bdon.glasses.lens.LensRuntime;
 import dev.bdon.glasses.path.DynamicNode;
 import dev.bdon.glasses.path.IndexFilterNode;
@@ -12,6 +11,7 @@ import dev.bdon.glasses.type.ListItemProperty;
 import dev.bdon.glasses.type.Property;
 import dev.bdon.glasses.type.Type;
 import dev.bdon.glasses.util.Assert;
+import dev.bdon.glasses.util.LensInternalException;
 
 import java.util.Deque;
 import java.util.List;

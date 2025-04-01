@@ -1,13 +1,17 @@
 package dev.bdon.glasses.lens.element;
 
-import dev.bdon.glasses.lens.*;
+import dev.bdon.glasses.lens.Blur;
+import dev.bdon.glasses.lens.Blurs;
+import dev.bdon.glasses.lens.LensRuntime;
 import dev.bdon.glasses.path.DynamicNode;
 import dev.bdon.glasses.path.IndexNode;
 import dev.bdon.glasses.path.PathNode;
 import dev.bdon.glasses.type.ListItemProperty;
 import dev.bdon.glasses.type.Property;
+import dev.bdon.glasses.type.Tracers;
 import dev.bdon.glasses.type.Type;
 import dev.bdon.glasses.util.Assert;
+import dev.bdon.glasses.util.LensConventionViolatedException;
 
 import java.util.Deque;
 import java.util.List;
@@ -43,7 +47,7 @@ public class SelectAtElement<O> extends SelectionElement<List<O>, O> {
   }
 
   private Blur<O> kill(Blur<List<O>> blur) {
-    O tracer = LensUtils.newTracer(property.type());
+    O tracer = Tracers.newTracer(property.type());
     return new Blur<>(blur.lens(), tracer, blur.path().append(pathNode), true);
   }
 

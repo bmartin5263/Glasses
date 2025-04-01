@@ -1,7 +1,7 @@
 package dev.bdon.glasses.type;
 
-import dev.bdon.glasses.lens.LensInternalException;
-import dev.bdon.glasses.lens.LensUtils;
+import dev.bdon.glasses.util.LensConfigurationException;
+import dev.bdon.glasses.util.LensInternalException;
 import dev.bdon.glasses.util.ReflectionUtils;
 import dev.bdon.glasses.util.Setter;
 
@@ -31,27 +31,43 @@ public class Type<T> {
     return new Type<>(clazz, properties);
   }
 
+  @SuppressWarnings("unchecked")
   public <X> FieldProperty<T, X> findProperty(T target, Setter<T, X> setter, Class<X> propertyType) {
-    var tracer = LensUtils.newTracer(propertyType);
-    var possible = propertiesByType.get(propertyType).stream()
+    // Create a tracer that will be injected into the target object and then located using reflection
+    var tracer = Tracers.newTracer(propertyType);
+
+    // Limit our search space by the type of property we are finding
+    var possibleProperties = propertiesByType.getOrDefault(propertyType, List.of())
+        .stream()
         .map(p -> new PossibleProperty<>(FieldProperty.unchecked(p), (X) p.get(target)))
         .toList();
 
+    // Inject the tracer
     setter.set(target, tracer);
 
-    for (var property : possible) {
+    // Find the property that represents the field the tracer got injected into
+    FieldProperty<T, X> result = null;
+    for (var property : possibleProperties) {
       var value = property.get(target);
-      property.resetOriginalValue(target);
       if (value == tracer) {
-        return FieldProperty.unchecked(property.actual());
+        if (result != null) {
+          // Fail fast instead of potentially returning the wrong property
+          throw new LensInternalException("Ambiguous property due to non-unique tracer. %s and %s match for type %s", property.actual(), result, propertyType);
+        }
+
+        // Reset the object back to its original pre-tracer-injection state
+        property.resetOriginalValue(target);
+
+        // Keep track of the result, but keep scanning to ensure there is no ambiguity
+        result = FieldProperty.unchecked(property.actual());
       }
     }
 
-    throw new LensInternalException("Unable to find property of type %s on target type %s", propertyType, target.getClass());
-  }
+    if (result != null) {
+      return result;
+    }
 
-  public T instantiate() {
-    return LensUtils.newTracer(clazz);
+    throw new LensConfigurationException("Unable to find property of type %s on target type %s", propertyType, target.getClass());
   }
 
   @SuppressWarnings("unchecked")

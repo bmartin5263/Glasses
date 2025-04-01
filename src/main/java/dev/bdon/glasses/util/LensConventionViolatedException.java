@@ -1,4 +1,4 @@
-package dev.bdon.glasses.lens;
+package dev.bdon.glasses.util;
 
 public class LensConventionViolatedException extends RuntimeException {
   public LensConventionViolatedException(String message) {
