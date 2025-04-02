@@ -11,7 +11,9 @@ import dev.bdon.glasses.type.Property;
 import dev.bdon.glasses.type.Tracers;
 import dev.bdon.glasses.util.Assert;
 
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 public class SelectElement<I, O> extends SelectionElement<I, O> {
   private final FieldProperty<I, O> property;
@@ -30,10 +32,19 @@ public class SelectElement<I, O> extends SelectionElement<I, O> {
     if (blur.isDead()) {
       return Blurs.of(kill(blur, pathNode));
     }
+
     var nextValue = property.get(blur.value());
     if (nextValue == null) {
       return Blurs.of(kill(blur, pathNode));
     }
+
+    if (nextValue instanceof List<?> nextList) {
+      // TODO - this may be too costly to force all lists to be copied to a mutable replacement
+      var replacement =  (O) new ArrayList<>(nextList);
+      property.set(blur.value(), replacement);
+      nextValue = replacement;
+    }
+
     return Blurs.of(
         new Blur<>(blur.lens(), nextValue, blur.path().append(pathNode))
     );

@@ -11,6 +11,7 @@ public sealed interface Lens<I, O> permits MonoLens, PolyLens {
   // Building Methods
   Lens<I, O> configure(Consumer<LensConfigurationBuilder> configurer);
   <X> Lens<I, X> select(Setter<O, X> setter, Class<X> type);
+  <X> Lens<I, X> selectAt(Setter<O, List<X>> setter, int indexAt, Class<X> type);
   <X> Lens<I, X> selectFirst(Setter<O, List<X>> setter, Class<X> type);
   <X> PolyLens<I, X> selectAll(Setter<O, List<X>> getter, Class<X> type);
 

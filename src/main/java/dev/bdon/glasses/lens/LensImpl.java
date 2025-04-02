@@ -88,17 +88,18 @@ class LensImpl {
     return constructor.construct(lens.context(), type, next);
   }
 
-  static <I, O, X, L extends Lens<I, X>> L selectFirst(
+  static <I, O, X, L extends Lens<I, X>> L selectAt(
       InternalLens<O> lens,
       Setter<O, List<X>> setter,
       Class<X> type,
+      int indexAt,
       LensConstructor<I, X, L> constructor
   ) {
     var target = Tracers.newTracer(lens.outputType());
     var listClass = LensImpl.<X>listClass();
     var listItemType = lens.context().findType(type);
     var listProperty = lens.context().findProperty(target, setter, listClass);
-    var next = new SelectAtElement<>(new SelectElement<>(lens.leaf(), listProperty), listItemType, 0);
+    var next = new SelectAtElement<>(new SelectElement<>(lens.leaf(), listProperty), listItemType, indexAt);
     return constructor.construct(lens.context(), type, next);
   }
 

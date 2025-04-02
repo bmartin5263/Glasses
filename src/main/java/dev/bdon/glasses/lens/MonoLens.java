@@ -63,8 +63,13 @@ public non-sealed class MonoLens<I, O> implements Lens<I, O> {
   }
 
   @Override
+  public <X> MonoLens<I, X> selectAt(Setter<O, List<X>> setter, int indexAt, Class<X> type) {
+    return LensImpl.selectAt(toInternalLens(), setter, type, indexAt, constructor());
+  }
+
+  @Override
   public <X> MonoLens<I, X> selectFirst(Setter<O, List<X>> setter, Class<X> type) {
-    return LensImpl.selectFirst(toInternalLens(), setter, type, constructor());
+    return LensImpl.selectAt(toInternalLens(), setter, type, 0, constructor());
   }
 
   @Override

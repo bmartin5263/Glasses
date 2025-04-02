@@ -35,9 +35,14 @@ public class ListItemProperty<O> implements Property<List<O>, O> {
   public void set(List<O> target, O newValue) {
     Assert.nonNull(target, "Attempting to access index %s on null list", index);
     if (index >= target.size()) {
+      while (target.size() < index) {
+        target.add(Tracers.newTracer(type));
+      }
       target.add(newValue);
     }
-    target.set(index, newValue);
+    else {
+      target.set(index, newValue);
+    }
   }
 
 }

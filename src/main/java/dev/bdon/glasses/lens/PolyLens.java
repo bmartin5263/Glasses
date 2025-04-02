@@ -58,7 +58,12 @@ public non-sealed class PolyLens<I, O> implements Lens<I, O> {
 
   @Override
   public <X> PolyLens<I, X> selectFirst(Setter<O, List<X>> setter, Class<X> type) {
-    return LensImpl.selectFirst(toInternalLens(), setter, type, constructor());
+    return LensImpl.selectAt(toInternalLens(), setter, type, 0, constructor());
+  }
+
+  @Override
+  public <X> PolyLens<I, X> selectAt(Setter<O, List<X>> setter, int indexAt, Class<X> type) {
+    return LensImpl.selectAt(toInternalLens(), setter, type, indexAt, constructor());
   }
 
   @Override
