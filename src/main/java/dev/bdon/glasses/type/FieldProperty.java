@@ -1,7 +1,6 @@
 package dev.bdon.glasses.type;
 
 import dev.bdon.glasses.util.LensInternalException;
-import dev.bdon.glasses.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;

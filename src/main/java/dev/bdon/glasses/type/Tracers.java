@@ -7,6 +7,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +32,21 @@ public class Tracers {
    * We need to suppress a lot of warnings for this because this is a very unconventional use-case that
    */
   @SuppressWarnings({"removal", "UnnecessaryBoxing", "CachedNumberConstructorCall", "BooleanConstructorCall"})
-  private static final Map<Class<?>, Supplier<?>> NON_DEFAULT_CONSTRUCTABLE_TYPES = Map.of(
-      Boolean.class, () -> new Boolean(false),
-      Byte.class, () -> new Byte((byte) 0xC8),
-      Character.class, () -> new Character((char) 0xC8C8),
-      Short.class, () -> new Short((short) 0xC8C8),
-      Integer.class, () -> new Integer(0xC8C8C8C8),
-      Long.class, () -> new Long(0xC8C8C8C8C8C8C8C8L),
-      Float.class, () -> new Float(0xC8C8C8C8),
-      Double.class, () -> new Double(0xC8C8C8C8C8C8C8C8L),
-      BigDecimal.class, () -> new BigDecimal("1.0"),
-      BigInteger.class, () -> new BigInteger("1")
+  private static final Map<Class<?>, Supplier<?>> NON_DEFAULT_CONSTRUCTABLE_TYPES = Map.ofEntries(
+      Map.<Class<?>, Supplier<?>>entry(Boolean.class, () -> new Boolean(false)),
+      Map.<Class<?>, Supplier<?>>entry(Byte.class, () -> new Byte((byte) 0xC8)),
+      Map.<Class<?>, Supplier<?>>entry(Character.class, () -> new Character((char) 0xC8C8)),
+      Map.<Class<?>, Supplier<?>>entry(Short.class, () -> new Short((short) 0xC8C8)),
+      Map.<Class<?>, Supplier<?>>entry(Integer.class, () -> new Integer(0xC8C8C8C8)),
+      Map.<Class<?>, Supplier<?>>entry(Long.class, () -> new Long(0xC8C8C8C8C8C8C8C8L)),
+      Map.<Class<?>, Supplier<?>>entry(Float.class, () -> new Float(0xC8C8C8C8)),
+      Map.<Class<?>, Supplier<?>>entry(Double.class, () -> new Double(0xC8C8C8C8C8C8C8C8L)),
+      Map.<Class<?>, Supplier<?>>entry(BigDecimal.class, () -> new BigDecimal("1.0")),
+      Map.<Class<?>, Supplier<?>>entry(BigInteger.class, () -> new BigInteger("1")),
+      Map.<Class<?>, Supplier<?>>entry(LocalTime.class, () -> LocalTime.of(0, 0, 0)),
+      Map.<Class<?>, Supplier<?>>entry(LocalDate.class, () -> LocalDate.of(0, 0, 0)),
+      Map.<Class<?>, Supplier<?>>entry(LocalDateTime.class, () -> LocalDateTime.of(0, 0, 0, 0, 0)),
+      Map.<Class<?>, Supplier<?>>entry(Instant.class, () -> Instant.ofEpochMilli(0))
   );
 
   /**

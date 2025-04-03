@@ -1,12 +1,11 @@
-package dev.bdon.glasses.util;
-
-import dev.bdon.glasses.type.JavaField;
+package dev.bdon.glasses.type;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 
 public class ReflectionUtils {
   private static final Set<Class<?>> PRIMITIVES = Set.of(
