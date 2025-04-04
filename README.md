@@ -1,5 +1,5 @@
 # _Glasses_
-👓 A lens library
+A lens library for Java
 
 ```java
 var lens = Lens.create(Library.class)
