@@ -46,5 +46,4 @@ class JsonPathWriterTest {
 
     assertThat(result).isEqualTo(".hello['world']");
   }
-
 }
